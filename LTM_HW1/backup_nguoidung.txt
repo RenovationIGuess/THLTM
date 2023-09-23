@@ -1,0 +1,6 @@
+lamu 1334546 active
+ramu 1984375 blocked
+aaa 9845743 idle
+man 439857 active
+omg 495843 idle
+yay 435987 blocked
