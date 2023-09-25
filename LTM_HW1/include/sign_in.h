@@ -1,5 +1,11 @@
 void sign_in()
 {
+  if (is_authenticated)
+  {
+    printf("\nYou are logged in as %s, please sign out first!\n", current_user->data.username);
+    return;
+  }
+
   // Validate username
   char *username = (char *)malloc(MAX_STRING_LENGTH * sizeof(char));
   bool valid_username = false; // true - existed already | false - not existed
