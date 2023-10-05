@@ -40,6 +40,21 @@ bool is_valid_domain_name(char *domain_name)
   return true;
 }
 
+bool is_valid_domain_name_but_not_ip_address(char *domain_name) {
+  // Check if the domain name is a valid domain name.
+  if (!is_valid_domain_name(domain_name)) {
+    return false;
+  }
+
+  // Check if the domain name is an IP address.
+  if (is_valid_ip_address(domain_name)) {
+    return false;
+  }
+
+  // The domain name is a valid domain name but not an IP address.
+  return true;
+}
+
 void get_ip_from_domain(char *param)
 {
   // Get the host information for the given domain name.

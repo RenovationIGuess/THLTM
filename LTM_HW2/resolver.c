@@ -5,8 +5,8 @@
 #include <arpa/inet.h>
 #include <ctype.h>
 #include <stdbool.h>
-#include "./includes/domain.h"
 #include "./includes/ip_address.h"
+#include "./includes/domain.h"
 
 int main(int argc, char *argv[])
 {
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
       printf("Invalid IP address!\n");
     break;
   case 2:
-    if (is_valid_domain_name(parameter2))
+    if (is_valid_domain_name_but_not_ip_address(parameter2))
       get_ip_from_domain(argv[2]);
     else
       printf("Invalid domain name!\n");
