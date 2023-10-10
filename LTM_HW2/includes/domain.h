@@ -1,60 +1,3 @@
-bool is_valid_domain_name(char *domain_name)
-{
-  // Check if the domain name is empty.
-  if (strlen(domain_name) == 0)
-  {
-    return false;
-  }
-
-  // Check if the domain name contains any invalid characters.
-  for (int i = 0; i < strlen(domain_name); i++)
-  {
-    if (!isalnum(domain_name[i]) && domain_name[i] != '-' && domain_name[i] != '.')
-    {
-      return false;
-    }
-  }
-
-  // Check if the domain name starts or ends with a hyphen.
-  if (domain_name[0] == '-' || domain_name[strlen(domain_name) - 1] == '-')
-  {
-    return false;
-  }
-
-  // Check if the domain name contains two consecutive hyphens.
-  for (int i = 0; i < strlen(domain_name) - 1; i++)
-  {
-    if (domain_name[i] == '-' && domain_name[i + 1] == '-')
-    {
-      return false;
-    }
-  }
-
-  // Check if the domain name contains a top-level domain (TLD).
-  if (!strstr(domain_name, "."))
-  {
-    return false;
-  }
-
-  // The domain name is valid.
-  return true;
-}
-
-bool is_valid_domain_name_but_not_ip_address(char *domain_name) {
-  // Check if the domain name is a valid domain name.
-  if (!is_valid_domain_name(domain_name)) {
-    return false;
-  }
-
-  // Check if the domain name is an IP address.
-  if (is_valid_ip_address(domain_name)) {
-    return false;
-  }
-
-  // The domain name is a valid domain name but not an IP address.
-  return true;
-}
-
 void get_ip_from_domain(char *param)
 {
   // Get the host information for the given domain name.
@@ -67,18 +10,41 @@ void get_ip_from_domain(char *param)
   int err = getaddrinfo(param, NULL, &hints, &res);
   if (err != 0)
   {
-    printf("Could not resolve domain name '%s': %s\n", param, gai_strerror(err));
+    printf("Not found information");
     exit(1);
   }
 
   // Print the IP addresses of the host.
-  printf("The IP addresses of '%s' are:\n", param);
+  int i = 0;
   for (struct addrinfo *p = res; p != NULL; p = p->ai_next)
   {
-    char ip_address[16];
-    inet_ntop(p->ai_family, &((struct sockaddr_in *)p->ai_addr)->sin_addr, ip_address, sizeof(ip_address));
+    if (p->ai_family == AF_INET || p->ai_family == AF_INET6)
+    {
+      char ip_address[INET6_ADDRSTRLEN];
+      void *addr;
+      if (p->ai_family == AF_INET)
+      {
+        addr = &((struct sockaddr_in *)p->ai_addr)->sin_addr;
+      }
+      else
+      {
+        addr = &((struct sockaddr_in6 *)p->ai_addr)->sin6_addr;
+      }
+      inet_ntop(p->ai_family, &((struct sockaddr_in *)p->ai_addr)->sin_addr, ip_address, sizeof(ip_address));
 
-    printf("  %s\n", ip_address);
+      if (i == 0)
+      {
+        printf("Official IP: %s\n", ip_address);
+        printf("Alias IP:\n");
+        i++;
+      }
+      else
+      {
+        printf("%s\n", ip_address);
+      }
+    }
+    else
+      printf("Not found information\n");
   }
 
   freeaddrinfo(res);
