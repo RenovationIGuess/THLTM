@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
     printf("Connecting to server...\n");
     int port_num = atoi(argv[1]);
 
-    // Create a UDP socket
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    // Create a TCP socket
+    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        printf("Create socket failed");
+        printf("Create TCP socket failed");
         // exit(1)
         exit(EXIT_FAILURE);
     }
@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
 
     // Config
     server_address.sin_family = AF_INET;
+    // server_address.sin_addr.s_addr = INADDR_ANY;
     server_address.sin_addr.s_addr = htonl(INADDR_ANY);
     server_address.sin_port = htons(port_num);
 
@@ -81,21 +82,47 @@ int main(int argc, char *argv[])
     {
         perror("Binding failed!");
         exit(EXIT_FAILURE);
+    } 
+    // else
+    // {
+    //     printf("Binding successful!\n");
+    //     printf("[%s:%d]\n", inet_ntoa(server_address.sin_addr),
+    //            ntohs(server_address.sin_port));
+    // }
+    
+    // Listen for incomming connections
+    if (listen(sockfd, 10) < 0)
+    {
+        printf("Listen failed!");
+        exit(EXIT_FAILURE);
+    } else printf("Server is running... Waiting for connections.\n");
+
+    // Accept an incomming connection
+    socklen_t len = sizeof(client_address);
+    socklen_t n;
+    
+    int clientfd = accept(sockfd, (struct sockaddr *)&client_address, &len);
+    if (clientfd < 0)
+    {
+        printf("Accept failed!\n");
+        exit(EXIT_FAILURE);
     }
     else
     {
-        printf("Binding successful!\n");
-        printf("[%s:%d]\n", inet_ntoa(server_address.sin_addr),
-               ntohs(server_address.sin_port));
+        printf("Accept successful!\n");
+        printf("[%s:%d]\n", inet_ntoa(client_address.sin_addr),
+               ntohs(client_address.sin_port));
     }
 
     while (1)
     {
-        socklen_t len, n;
-        len = sizeof(client_address);
-
         // Receive the username from client
-        n = recvfrom(sockfd, (char *)buffer, MAX_BUFFER_SIZE, MSG_WAITALL, (struct sockaddr *)&client_address, &len);
+        n = recv(clientfd, (char *)buffer, MAX_BUFFER_SIZE, 0);
+        if (n < 0)
+        {
+            printf("Receive failed\n");
+            exit(EXIT_FAILURE);
+        }
         buffer[n] = '\0';
         char username[MAX_BUFFER_SIZE];
         strcpy(username, buffer);
@@ -103,18 +130,33 @@ int main(int argc, char *argv[])
         if (!check_username_input(username))
         {
             char *ack = "Account not found";
-            sendto(sockfd, (const char *)ack, strlen(ack), MSG_CONFIRM, (const struct sockaddr *)&client_address, len);
+            n = send(clientfd, (const char *)ack, sizeof(ack), 0);
+            if (n < 0)
+            {
+                printf("Send failed\n");
+                exit(EXIT_FAILURE);
+            }
         }
         else
         {
             char *ack = "Insert password";
-            sendto(sockfd, (const char *)ack, strlen(ack), MSG_CONFIRM, (const struct sockaddr *)&client_address, len);
+            n = send(clientfd, (const char *)ack, sizeof(ack), 0);
+            if (n < 0)
+            {
+                printf("Send failed\n");
+                exit(EXIT_FAILURE);
+            }
             int invalid_login_count = 0;
 
             while (invalid_login_count <= 2)
             {
                 // Receive the password
-                n = recvfrom(sockfd, (char *)buffer, MAX_BUFFER_SIZE, MSG_WAITALL, (struct sockaddr *)&client_address, &len);
+                n = recv(clientfd, (char *)buffer, MAX_BUFFER_SIZE, 0);
+                if (n < 0)
+                {
+                    printf("Receive failed\n");
+                    exit(EXIT_FAILURE);
+                }
                 buffer[n] = '\0';
                 char password[MAX_BUFFER_SIZE];
                 strcpy(password, buffer);
@@ -124,7 +166,12 @@ int main(int argc, char *argv[])
                 {
                     invalid_login_count++;
                     char *ack = "Not OK";
-                    sendto(sockfd, (const char *)ack, strlen(ack), MSG_CONFIRM, (const struct sockaddr *)&client_address, len);
+                    n = send(clientfd, (const char *)ack, sizeof(ack), 0);
+                    if (n < 0)
+                    {
+                        printf("Send failed\n");
+                        exit(EXIT_FAILURE);
+                    }
                 }
                 // If matched
                 // If account is activated
@@ -132,12 +179,22 @@ int main(int argc, char *argv[])
                 {
                     logged_user = cur;
                     char *ack = "OK";
-                    sendto(sockfd, (const char *)ack, strlen(ack), MSG_CONFIRM, (const struct sockaddr *)&client_address, len);
+                    n = send(clientfd, (const char *)ack, sizeof(ack), 0);
+                    if (n < 0)
+                    {
+                        printf("Send failed\n");
+                        exit(EXIT_FAILURE);
+                    }
 
                     while (1)
                     {
                         // Recieve new password from the client
-                        n = recvfrom(sockfd, (char *)buffer, MAX_BUFFER_SIZE, MSG_WAITALL, (struct sockaddr *)&client_address, &len);
+                        n = recv(clientfd, (char *)buffer, MAX_BUFFER_SIZE, 0);
+                        if (n < 0)
+                        {
+                            printf("Receive failed\n");
+                            exit(EXIT_FAILURE);
+                        }
                         buffer[n] = '\0';
 
                         // If the user did not want to update password and sign out
@@ -145,7 +202,12 @@ int main(int argc, char *argv[])
                         {
                             char end_msg[] = "Goodbye ";
                             strcat(end_msg, logged_user->data.username);
-                            sendto(sockfd, (const char *)end_msg, strlen(end_msg), MSG_CONFIRM, (const struct sockaddr *)&client_address, len);
+                            n = send(clientfd, (const char *)end_msg, sizeof(end_msg), 0);
+                            if (n < 0)
+                            {
+                                printf("Send failed\n");
+                                exit(EXIT_FAILURE);
+                            }
                             logged_user = NULL;
                             break;
                         }
@@ -157,13 +219,19 @@ int main(int argc, char *argv[])
                         if (!check_password_input(new_password))
                         {
                             char *ack1 = "Error";
-                            sendto(sockfd, (const char *)ack, strlen(ack1), MSG_CONFIRM, (const struct sockaddr *)&client_address, len);
+                            n = send(clientfd, (const char *)ack1, sizeof(ack1), 0);
+                            if (n < 0)
+                            {
+                                printf("Send failed\n");
+                                exit(EXIT_FAILURE);
+                            }
                         }
                         else
                         {
                             // Now we update the new password
                             // Set new password for user
                             strcpy(logged_user->data.password, new_password);
+                            // printf("New password: %s\n", new_password);
 
                             // Save to the file
                             rewrite_file();
@@ -173,8 +241,13 @@ int main(int argc, char *argv[])
                             // String to store numbers
                             char *numbers = (char *)malloc(MAX_BUFFER_SIZE * sizeof(char));
 
+                            // memset(&chars, 0, sizeof(chars));
+                            // memset(&numbers, 0, sizeof(numbers));
+
                             int char_index = 0;
                             int number_index = 0;
+
+                            // printf("New password: %s\n", new_password);
 
                             for (int i = 0; i < strlen(new_password); i++)
                             {
@@ -190,6 +263,8 @@ int main(int argc, char *argv[])
 
                             chars[char_index] = '\0';     // Null-terminate the character string
                             numbers[number_index] = '\0'; // Null-terminate the number string
+
+                            // printf("\'%s\'\n\'%s\'\n", chars, numbers);
 
                             char ack2[MAX_BUFFER_SIZE];
                             // Encrypted data will be:
@@ -208,7 +283,12 @@ int main(int argc, char *argv[])
                                 strcat(ack2, "\n");
                                 strcat(ack2, numbers);
                             }
-                            sendto(sockfd, (const char *)ack2, strlen(ack2), MSG_CONFIRM, (const struct sockaddr *)&client_address, len);
+                            n = send(clientfd, (const char *)ack2, sizeof(ack2), 0);
+                            if (n < 0)
+                            {
+                                printf("Send failed\n");
+                                exit(EXIT_FAILURE);
+                            }
 
                             free(chars);
                             free(numbers);
@@ -227,7 +307,12 @@ int main(int argc, char *argv[])
                     {
                         strcpy(ack2, "Account is blocked");
                     }
-                    sendto(sockfd, (const char *)ack2, strlen(ack2), MSG_CONFIRM, (const struct sockaddr *)&client_address, len);
+                    n = send(clientfd, (const char *)ack2, sizeof(ack2), 0);
+                    if (n < 0)
+                    {
+                        printf("Send failed\n");
+                        exit(EXIT_FAILURE);
+                    }
                     break;
                 }
             }
@@ -238,7 +323,12 @@ int main(int argc, char *argv[])
                 delete_middle(); // Delete current pointer info
                 rewrite_file();
                 char *ack = "Account is blocked";
-                sendto(sockfd, (const char *)ack, strlen(ack), MSG_CONFIRM, (const struct sockaddr *)&client_address, len);
+                n = send(clientfd, (const char *)ack, sizeof(ack), 0);
+                if (n < 0)
+                {
+                    printf("Send failed\n");
+                    exit(EXIT_FAILURE);
+                }
                 break;
             }
         }
@@ -246,6 +336,7 @@ int main(int argc, char *argv[])
 
     // Close the socket
     close(sockfd);
-
+    close(clientfd);
+    
     return 0;
 }
