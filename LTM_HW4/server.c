@@ -199,11 +199,16 @@ int main(int argc, char *argv[])
                             int chars_len = strlen(chars);
                             int numbers_len = strlen(numbers);
 
-                            if (chars_len == 0) {
+                            if (chars_len == 0)
+                            {
                                 strcpy(ack2, numbers);
-                            } else if (numbers_len == 0) {
+                            }
+                            else if (numbers_len == 0)
+                            {
                                 strcpy(ack2, chars);
-                            } else {
+                            }
+                            else
+                            {
                                 strcpy(ack2, chars);
                                 strcat(ack2, "\n");
                                 strcat(ack2, numbers);
@@ -235,7 +240,10 @@ int main(int argc, char *argv[])
             if (invalid_login_count > 2)
             {
                 // Delete account
-                delete_middle(); // Delete current pointer info
+                if (cur == l)
+                    delete_head();
+                else
+                    delete_middle(); // Delete current pointer info
                 rewrite_file();
                 char *ack = "Account is blocked";
                 sendto(sockfd, (const char *)ack, strlen(ack), MSG_CONFIRM, (const struct sockaddr *)&client_address, len);

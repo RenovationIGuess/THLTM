@@ -8,6 +8,10 @@ all: $(EXE_FILES)
 %: %.c
 	$(CC) $(CFLAGS) -o $@.exe $<
 
+compile:
+	$(CC) server.c -o server
+	$(CC) client.c -o client
+
 clean:
 	rm -f $(EXE_FILES:%=%*.exe)
 

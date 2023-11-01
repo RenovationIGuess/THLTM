@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     fgets(username, sizeof(username), stdin);
     // Remove the newline character at the end of the username
     username[strcspn(username, "\n")] = 0;
-    n = send(sockfd, (const char *)username, MAX_BUFFER_SIZE, 0);
+    n = send(sockfd, (const char *)username, sizeof(username), 0);
     if (n < 0)
     {
         printf("Send failed\n");
@@ -181,6 +181,9 @@ int main(int argc, char *argv[])
         }
         buffer[n] = '\0';
         printf("%s\n", buffer);
+
+        if (strcmp(buffer, "Account is blocked") == 0)
+            break;
     }
 
     if (strcmp(buffer, "OK") == 0)
@@ -195,8 +198,6 @@ int main(int argc, char *argv[])
             strcpy(validate, new_password);
 
             n = send(sockfd, (const char *)new_password, MAX_BUFFER_SIZE, 0);
-            // printf("\'%s\'\n", new_password);
-
             if (n < 0)
             {
                 printf("Send failed\n");
@@ -212,10 +213,8 @@ int main(int argc, char *argv[])
             buffer[n] = '\0';
             printf("%s\n", buffer);
 
-            if (strcmp(validate, "bye") == 0) {
-                // printf("Stop the program\n");
+            if (strcmp(validate, "bye") == 0)
                 break;
-            }
         }
     }
 

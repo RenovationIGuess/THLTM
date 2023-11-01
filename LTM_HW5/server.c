@@ -82,25 +82,27 @@ int main(int argc, char *argv[])
     {
         perror("Binding failed!");
         exit(EXIT_FAILURE);
-    } 
+    }
     // else
     // {
     //     printf("Binding successful!\n");
     //     printf("[%s:%d]\n", inet_ntoa(server_address.sin_addr),
     //            ntohs(server_address.sin_port));
     // }
-    
+
     // Listen for incomming connections
     if (listen(sockfd, 10) < 0)
     {
         printf("Listen failed!");
         exit(EXIT_FAILURE);
-    } else printf("Server is running... Waiting for connections.\n");
+    }
+    else
+        printf("Server is running... Waiting for connections.\n");
 
     // Accept an incomming connection
     socklen_t len = sizeof(client_address);
     socklen_t n;
-    
+
     int clientfd = accept(sockfd, (struct sockaddr *)&client_address, &len);
     if (clientfd < 0)
     {
@@ -130,7 +132,7 @@ int main(int argc, char *argv[])
         if (!check_username_input(username))
         {
             char *ack = "Account not found";
-            n = send(clientfd, (const char *)ack, sizeof(ack), 0);
+            n = send(clientfd, (const char *)ack, MAX_BUFFER_SIZE, 0);
             if (n < 0)
             {
                 printf("Send failed\n");
@@ -140,7 +142,7 @@ int main(int argc, char *argv[])
         else
         {
             char *ack = "Insert password";
-            n = send(clientfd, (const char *)ack, sizeof(ack), 0);
+            n = send(clientfd, (const char *)ack, MAX_BUFFER_SIZE, 0);
             if (n < 0)
             {
                 printf("Send failed\n");
@@ -166,7 +168,7 @@ int main(int argc, char *argv[])
                 {
                     invalid_login_count++;
                     char *ack = "Not OK";
-                    n = send(clientfd, (const char *)ack, sizeof(ack), 0);
+                    n = send(clientfd, (const char *)ack, MAX_BUFFER_SIZE, 0);
                     if (n < 0)
                     {
                         printf("Send failed\n");
@@ -179,7 +181,7 @@ int main(int argc, char *argv[])
                 {
                     logged_user = cur;
                     char *ack = "OK";
-                    n = send(clientfd, (const char *)ack, sizeof(ack), 0);
+                    n = send(clientfd, (const char *)ack, MAX_BUFFER_SIZE, 0);
                     if (n < 0)
                     {
                         printf("Send failed\n");
@@ -202,7 +204,7 @@ int main(int argc, char *argv[])
                         {
                             char end_msg[] = "Goodbye ";
                             strcat(end_msg, logged_user->data.username);
-                            n = send(clientfd, (const char *)end_msg, sizeof(end_msg), 0);
+                            n = send(clientfd, (const char *)end_msg, MAX_BUFFER_SIZE, 0);
                             if (n < 0)
                             {
                                 printf("Send failed\n");
@@ -219,7 +221,7 @@ int main(int argc, char *argv[])
                         if (!check_password_input(new_password))
                         {
                             char *ack1 = "Error";
-                            n = send(clientfd, (const char *)ack1, sizeof(ack1), 0);
+                            n = send(clientfd, (const char *)ack1, MAX_BUFFER_SIZE, 0);
                             if (n < 0)
                             {
                                 printf("Send failed\n");
@@ -274,16 +276,21 @@ int main(int argc, char *argv[])
                             int chars_len = strlen(chars);
                             int numbers_len = strlen(numbers);
 
-                            if (chars_len == 0) {
+                            if (chars_len == 0)
+                            {
                                 strcpy(ack2, numbers);
-                            } else if (numbers_len == 0) {
+                            }
+                            else if (numbers_len == 0)
+                            {
                                 strcpy(ack2, chars);
-                            } else {
+                            }
+                            else
+                            {
                                 strcpy(ack2, chars);
                                 strcat(ack2, "\n");
                                 strcat(ack2, numbers);
                             }
-                            n = send(clientfd, (const char *)ack2, sizeof(ack2), 0);
+                            n = send(clientfd, (const char *)ack2, MAX_BUFFER_SIZE, 0);
                             if (n < 0)
                             {
                                 printf("Send failed\n");
@@ -307,7 +314,7 @@ int main(int argc, char *argv[])
                     {
                         strcpy(ack2, "Account is blocked");
                     }
-                    n = send(clientfd, (const char *)ack2, sizeof(ack2), 0);
+                    n = send(clientfd, (const char *)ack2, MAX_BUFFER_SIZE, 0);
                     if (n < 0)
                     {
                         printf("Send failed\n");
@@ -320,10 +327,13 @@ int main(int argc, char *argv[])
             if (invalid_login_count > 2)
             {
                 // Delete account
-                delete_middle(); // Delete current pointer info
+                if (cur == l)
+                    delete_head();
+                else
+                    delete_middle(); // Delete current pointer info
                 rewrite_file();
                 char *ack = "Account is blocked";
-                n = send(clientfd, (const char *)ack, sizeof(ack), 0);
+                n = send(clientfd, (const char *)ack, MAX_BUFFER_SIZE, 0);
                 if (n < 0)
                 {
                     printf("Send failed\n");
@@ -337,6 +347,6 @@ int main(int argc, char *argv[])
     // Close the socket
     close(sockfd);
     close(clientfd);
-    
+
     return 0;
 }
