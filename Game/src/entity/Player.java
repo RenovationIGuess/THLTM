@@ -2,6 +2,7 @@ package entity;
 
 //import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -14,17 +15,29 @@ public class Player extends Entity {
 	GamePanel gp;
 	KeyHandler keyH;
 	
+	public final int screenX;
+	public final int screenY;
+	
 	public Player(GamePanel gp, KeyHandler keyH) {
 		this.gp = gp;
 		this.keyH = keyH;
+		
+		screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
+		screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
+		
+		solidArea = new Rectangle();
+		solidArea.x = 8;
+		solidArea.y = 16;
+		solidArea.width = 32;
+		solidArea.height = 32;
 		
 		setDefaultValues();
 		getPlayerImage();
 	}
 	
 	public void setDefaultValues() {
-		x = 100;
-		y = 100;
+		worldX = gp.tileSize * 23;
+		worldY = gp.tileSize * 21;
 		speed = 4;
 		direction = "down";
 	}
@@ -34,12 +47,15 @@ public class Player extends Entity {
 			up0 = ImageIO.read(getClass().getResourceAsStream("/player/bs_up_0.png"));
 			up1 = ImageIO.read(getClass().getResourceAsStream("/player/bs_up_1.png"));
 			up2 = ImageIO.read(getClass().getResourceAsStream("/player/bs_up_2.png"));
+			
 			down0 = ImageIO.read(getClass().getResourceAsStream("/player/bs_down_0.png"));
 			down1 = ImageIO.read(getClass().getResourceAsStream("/player/bs_down_1.png"));
 			down2 = ImageIO.read(getClass().getResourceAsStream("/player/bs_down_2.png"));
+			
 			left0 = ImageIO.read(getClass().getResourceAsStream("/player/bs_left_0.png"));
 			left1 = ImageIO.read(getClass().getResourceAsStream("/player/bs_left_1.png"));
 			left2 = ImageIO.read(getClass().getResourceAsStream("/player/bs_left_2.png"));
+			
 			right0 = ImageIO.read(getClass().getResourceAsStream("/player/bs_right_0.png"));
 			right1 = ImageIO.read(getClass().getResourceAsStream("/player/bs_right_1.png"));
 			right2 = ImageIO.read(getClass().getResourceAsStream("/player/bs_right_2.png"));
@@ -57,16 +73,34 @@ public class Player extends Entity {
 		{
 			if (keyH.upPressed == true) {
 				direction = "up";
-				y -= speed;
 			} else if (keyH.downPressed == true) {
 				direction = "down";
-				y += speed;
 			} else if (keyH.leftPressed == true) {
 				direction = "left";
-				x -= speed;
 			} else if (keyH.rightPressed == true) {
 				direction = "right";
-				x += speed;
+			}
+			
+//			Check tile collision
+			collisionOn = false;
+			gp.cChecker.checkTile(this);
+			
+//			IF COLLISION is false, player can move
+			if (collisionOn == false) {
+				switch (direction) {
+				case "up":
+					worldY -= speed;
+					break;
+				case "down":
+					worldY += speed;
+					break;
+				case "left":
+					worldX -= speed;
+					break;
+				case "right":
+					worldX += speed;
+					break;
+				}
 			}
 			
 	//		Because we are using 144 FPS, so every 24 frames we'll re-draw the player once 
@@ -142,6 +176,6 @@ public class Player extends Entity {
 				break;
 		}
 		
-		g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
+		g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
 	}
 }
