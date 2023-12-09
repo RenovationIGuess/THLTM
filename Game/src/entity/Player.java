@@ -48,21 +48,32 @@ public class Player extends Entity {
 	}
 	
 	public void getPlayerImage() {
-		up0 = setup("bs_up_0");
-		up1 = setup("bs_up_1");
-		up2 = setup("bs_up_2");
+//		up0 = setup("bs_up_0");
+//		up1 = setup("bs_up_1");
+//		up2 = setup("bs_up_2");
+//		
+//		down0 = setup("bs_down_0");
+//		down1 = setup("bs_down_1");
+//		down2 = setup("bs_down_2");
+//		
+//		left0 = setup("bs_left_0");
+//		left1 = setup("bs_left_1");
+//		left2 = setup("bs_left_2");
+//		
+//		right0 = setup("bs_right_0");
+//		right1 = setup("bs_right_1");
+//		right2 = setup("bs_right_2");
+		up1 = setup("boy_up_1");
+		up2 = setup("boy_up_2");
 		
-		down0 = setup("bs_down_0");
-		down1 = setup("bs_down_1");
-		down2 = setup("bs_down_2");
+		down1 = setup("boy_down_1");
+		down2 = setup("boy_down_2");
 		
-		left0 = setup("bs_left_0");
-		left1 = setup("bs_left_1");
-		left2 = setup("bs_left_2");
+		left1 = setup("boy_left_1");
+		left2 = setup("boy_left_2");
 		
-		right0 = setup("bs_right_0");
-		right1 = setup("bs_right_1");
-		right2 = setup("bs_right_2");
+		right1 = setup("boy_right_1");
+		right2 = setup("boy_right_2");
 	}
 	
 	public BufferedImage setup(String imageName) {
@@ -125,20 +136,21 @@ public class Player extends Entity {
 	//		Because we are using 144 FPS, so every 24 frames we'll re-draw the player once 
 			spriteCounter++;
 			if (spriteCounter > 24) {
-				if (spriteNum == 0) {
-					spriteNum = 1;
-				}
-				else if (spriteNum == 1) {
+//				if (spriteNum == 0) {
+//					spriteNum = 1;
+//				}
+//				else 
+				if (spriteNum == 1) {
 					spriteNum = 2;
 				}
 				else if (spriteNum == 2) {
-					spriteNum = 0;
+					spriteNum = 1;
 				}
 				spriteCounter = 0;
 			}
 		} else {
 //			If user | player did not press any keys
-			spriteNum = 0;
+			spriteNum = 1;
 		}
 	}
 	
