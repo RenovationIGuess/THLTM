@@ -20,26 +20,76 @@ public class TileManager {
 	public TileManager(GamePanel gp) {
 		this.gp = gp;
 //		Array of tiles: grass, water, snow, etc
-		tile = new Tile[20];
+		tile = new Tile[50];
 		mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow];
 		
 		getTileImage();
-		loadMap("/maps/world01.txt");
+		loadMap("/maps/worldV2.txt");
 	}
 	
 	public void getTileImage() {
-		setup(0, "light_grass", false);
-		setup(1, "dark_grass", false);
-		setup(2, "light_desert", false);
-		setup(3, "dark_desert", false);
-		setup(4, "snow", false);
-		setup(5, "water", false);
-		setup(6, "wood", false);
-		setup(7, "house_1", true);
-		setup(8, "house_2", true);
-		setup(9, "sakura", true);
-		setup(10, "triple_green_tree", true);
-		setup(11, "big_brown_rock", true);
+//		setup(0, "light_grass", false);
+//		setup(1, "dark_grass", false);
+//		setup(2, "light_desert", false);
+//		setup(3, "dark_desert", false);
+//		setup(4, "snow", false);
+//		setup(5, "water", false);
+//		setup(6, "wood", false);
+//		setup(7, "house_1", true);
+//		setup(8, "house_2", true);
+//		setup(9, "sakura", true);
+//		setup(10, "triple_green_tree", true);
+//		setup(11, "big_brown_rock", true);
+		
+//		Skip index from 0 -> 9 to avoid hard-readability in map.txt
+//		And avoid IO exception
+		setup(0, "grass00", false);
+		setup(1, "grass00", false);
+		setup(2, "grass00", false);
+		setup(3, "grass00", false);
+		setup(4, "grass00", false);
+		setup(5, "grass00", false);
+		setup(6, "grass00", false);
+		setup(7, "grass00", false);
+		setup(8, "grass00", false);
+		setup(9, "grass00", false);
+		
+		setup(10, "grass00", false);
+		setup(11, "grass01", false);
+		
+		setup(12, "water00", true);
+		setup(13, "water01", true);
+		setup(14, "water02", true);
+		setup(15, "water03", true);
+		setup(16, "water04", true);
+		setup(17, "water05", true);
+		setup(18, "water06", true);
+		setup(19, "water07", true);
+		setup(20, "water08", true);
+		setup(21, "water09", true);
+		setup(22, "water10", true);
+		setup(23, "water11", true);
+		setup(24, "water12", true);
+		setup(25, "water13", true);
+		
+		setup(26, "road00", false);
+		setup(27, "road01", false);
+		setup(28, "road02", false);
+		setup(29, "road03", false);
+		setup(30, "road04", false);
+		setup(31, "road05", false);
+		setup(32, "road06", false);
+		setup(33, "road07", false);
+		setup(34, "road08", false);
+		setup(35, "road09", false);
+		setup(36, "road10", false);
+		setup(37, "road11", false);
+		setup(38, "road12", false);
+		
+		setup(39, "earth", false);
+		
+		setup(40, "wall", true);
+		setup(41, "tree", true);
 	}
 	
 	public void setup(int index, String imageName, boolean collision) {
