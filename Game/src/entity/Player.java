@@ -13,16 +13,16 @@ import main.KeyHandler;
 import main.UtilityTool;
 
 public class Player extends Entity {
-	GamePanel gp;
 	KeyHandler keyH;
 	
 	public final int screenX;
 	public final int screenY;
 	
-	public int hasKey = 0;
+	int standCounter = 0;
 	
 	public Player(GamePanel gp, KeyHandler keyH) {
-		this.gp = gp;
+		super(gp);
+		
 		this.keyH = keyH;
 		
 		screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
@@ -43,51 +43,22 @@ public class Player extends Entity {
 	public void setDefaultValues() {
 		worldX = gp.tileSize * 23;
 		worldY = gp.tileSize * 21;
-		speed = 4;
+		speed = 2;
 		direction = "down";
 	}
 	
 	public void getPlayerImage() {
-//		up0 = setup("bs_up_0");
-//		up1 = setup("bs_up_1");
-//		up2 = setup("bs_up_2");
-//		
-//		down0 = setup("bs_down_0");
-//		down1 = setup("bs_down_1");
-//		down2 = setup("bs_down_2");
-//		
-//		left0 = setup("bs_left_0");
-//		left1 = setup("bs_left_1");
-//		left2 = setup("bs_left_2");
-//		
-//		right0 = setup("bs_right_0");
-//		right1 = setup("bs_right_1");
-//		right2 = setup("bs_right_2");
-		up1 = setup("boy_up_1");
-		up2 = setup("boy_up_2");
+		up1 = setup("/player/boy_up_1");
+		up2 = setup("/player/boy_up_2");
 		
-		down1 = setup("boy_down_1");
-		down2 = setup("boy_down_2");
+		down1 = setup("/player/boy_down_1");
+		down2 = setup("/player/boy_down_2");
 		
-		left1 = setup("boy_left_1");
-		left2 = setup("boy_left_2");
+		left1 = setup("/player/boy_left_1");
+		left2 = setup("/player/boy_left_2");
 		
-		right1 = setup("boy_right_1");
-		right2 = setup("boy_right_2");
-	}
-	
-	public BufferedImage setup(String imageName) {
-		UtilityTool uTool = new UtilityTool();
-		BufferedImage image = null;
-		
-		try {
-			image = ImageIO.read(getClass().getResourceAsStream("/player/" + imageName + ".png"));
-			image = uTool.scaleImage(image, gp.tileSize, gp.tileSize);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return image;
+		right1 = setup("/player/boy_right_1");
+		right2 = setup("/player/boy_right_2");
 	}
 	
 	public void update() {
@@ -114,6 +85,10 @@ public class Player extends Entity {
 //			Check object collision
 			int objIndex = gp.cChecker.checkObject(this, true);
 			pickUpObject(objIndex);
+			
+//			Check NPCs collision
+			int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
+			interactNPC(npcIndex);
 			
 //			IF COLLISION is false, player can move
 			if (collisionOn == false) {
@@ -150,47 +125,29 @@ public class Player extends Entity {
 			}
 		} else {
 //			If user | player did not press any keys
-			spriteNum = 1;
+			standCounter++;
+			if (standCounter == 24) {
+				spriteNum = 1;
+				standCounter = 0;
+			}
 		}
 	}
 	
 	public void pickUpObject(int i) {
 //		Didn't touch any object <=> i == 999
 		if (i != 999) {
-//			gp.obj[i] = null;
-			String objectName = gp.obj[i].name;
-			
-			switch(objectName) {
-			case "Key":
-				gp.playSE(1);
-				hasKey++;
-				gp.obj[i] = null;
-				gp.ui.showMessage("Key obtained!");
-				break;
-			case "Door":
-				gp.playSE(4);
-				if (hasKey > 0) {
-					gp.obj[i] = null;
-					hasKey--;
-					gp.ui.showMessage("Door opened!");
-				} else {
-					gp.ui.showMessage("You need a key!");
-				}
-				System.out.println("Key: " + hasKey);
-				break;
-			case "Boots":
-				gp.playSE(2);
-				speed += 1;
-				gp.obj[i] = null;
-				gp.ui.showMessage("Speed boost +1!");
-				break;
-			case "Chest":
-				gp.ui.gameFinished = true;
-				gp.stopMusic();
-				gp.playSE(3);
-				break;
+//			TODO:
+		}
+	}
+	
+	public void interactNPC(int i) {
+		if (i != 999) {
+			if (gp.keyH.enterPressed) {
+				gp.gameState = gp.dialogueState;
+				gp.npc[i].speak();
 			}
 		}
+		gp.keyH.enterPressed = false;
 	}
 	
 	public void draw(Graphics2D g2) {
