@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
+import entity.Entity;
 import entity.Player;
 import object.AssetSetter;
 import object.SuperObject;
@@ -38,7 +39,7 @@ public class GamePanel extends JPanel implements Runnable {
 	int FPS = 144;
 	
 	TileManager tileM = new TileManager(this);
-	KeyHandler keyH = new KeyHandler();
+	public KeyHandler keyH = new KeyHandler(this);
 	Sound music = new Sound();
 	Sound se = new Sound();
 	public CollisionChecker cChecker = new CollisionChecker(this);
@@ -49,12 +50,13 @@ public class GamePanel extends JPanel implements Runnable {
 //	Entity and object
 	public Player player = new Player(this, keyH);
 	public SuperObject obj[] = new SuperObject[10];
+	public Entity npc[] = new Entity[10];
 	
-	
-	// Set player's default position
-//	int playerX = 100;
-//	int playerY = 100;
-//	int playerSpeed = 4;
+//	GAME STATE
+	public int gameState;
+	public final int playState = 1;
+	public final int pauseState = 2;
+	public final int dialogueState = 3;
 	
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -67,7 +69,12 @@ public class GamePanel extends JPanel implements Runnable {
 	public void setupGame() {
 		aSetter.setObject();
 		
+		aSetter.setNPC();
+		
 		playMusic(0);
+		stopMusic();
+		
+		gameState = playState;
 	}
 	
 	public void startGameThread() {
@@ -77,37 +84,6 @@ public class GamePanel extends JPanel implements Runnable {
 	
 	// @Override
 	public void run() {
-//		Sleep method
-//		double drawInterval = 1000000000/FPS;
-//		double nextDrawTime = System.nanoTime() + drawInterval;
-//		
-//		while (gameThread != null) {
-//			// long currentTime = System.nanoTime(); // More precise
-//			// long currentTime2 = System.currentTimeMillis();
-//			
-//			// 1. UPDATE: update information such as character positions
-//			update();
-//			
-//			// 2. DRAW: draw the screen with the updated information
-//			repaint(); // This is how to call the paintComponent method
-//			
-//			try {
-//				double remainingTime = nextDrawTime - System.nanoTime();
-//				remainingTime = remainingTime/1000000;
-//				
-//				if (remainingTime < 0) {
-//					remainingTime = 0;
-//				}
-//				
-//				Thread.sleep((long) remainingTime);
-//				
-//				nextDrawTime += drawInterval;
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
-		
 //		Delta / Accumulator method
 		double drawInterval = 1000000000/FPS;
 		double delta = 0;
@@ -139,7 +115,20 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 	
 	public void update() {
-		player.update();
+		if (gameState == playState) {
+//			PLAYER
+			player.update();
+			
+//			NPCs
+			for (int i = 0; i < npc.length; ++i) {
+				if (npc[i] != null) {
+					npc[i].update();
+				}
+			}
+		}
+		if (gameState == pauseState) {
+			
+		}
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -160,6 +149,13 @@ public class GamePanel extends JPanel implements Runnable {
 		for (int i = 0; i < obj.length; ++i) {
 			if (obj[i] != null) {
 				obj[i].draw(g2, this);
+			}
+		}
+		
+//		NPC
+		for (int i = 0; i < npc.length; ++i) {
+			if (npc[i] != null) {
+				npc[i].draw(g2);
 			}
 		}
 		
