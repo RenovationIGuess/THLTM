@@ -25,6 +25,79 @@ public class KeyHandler implements KeyListener {
 		
 //		System.out.println("Key code: " + code);
 		
+//		TITLE STATE
+		if (gp.gameState == gp.titleState) {
+			if (gp.ui.titleScreenState == 0) {
+				if (code == KeyEvent.VK_W) {
+					if (gp.ui.commandNum == 0) {
+						gp.ui.commandNum = 2;
+					} else gp.ui.commandNum--;
+				}
+				
+				if (code == KeyEvent.VK_S) {
+					if (gp.ui.commandNum == 2) {
+						gp.ui.commandNum = 0;
+					} else gp.ui.commandNum++;
+				}
+				
+				if (code == KeyEvent.VK_ENTER) {
+					if (gp.ui.commandNum == 0) {
+//						gp.gameState = gp.playState;
+						gp.playMusic(0);
+						gp.ui.titleScreenState = 1;
+					}
+					
+					if (gp.ui.commandNum == 1) {
+//						
+					}
+					
+					if (gp.ui.commandNum == 2) {
+						System.exit(0);
+					}
+				}
+			}
+			
+			else if (gp.ui.titleScreenState == 1) {
+				if (code == KeyEvent.VK_W) {
+					if (gp.ui.commandNum == 0) {
+						gp.ui.commandNum = 3;
+					} else gp.ui.commandNum--;
+				}
+				
+				if (code == KeyEvent.VK_S) {
+					if (gp.ui.commandNum == 3) {
+						gp.ui.commandNum = 0;
+					} else gp.ui.commandNum++;
+				}
+				
+				if (code == KeyEvent.VK_ENTER) {
+					if (gp.ui.commandNum == 0) {
+//						TODO: Fighter class chosen
+						gp.gameState = gp.playState;
+//						gp.playMusic(0);
+						gp.ui.titleScreenState = 1;
+					}
+					
+					if (gp.ui.commandNum == 1) {
+//						TODO: Thief class chosen
+						gp.gameState = gp.playState;
+//						gp.playMusic(0);
+					}
+					
+					if (gp.ui.commandNum == 2) {
+//						TODO: Sorcerer class chosen
+						gp.gameState = gp.playState;
+//						gp.playMusic(0);
+					}
+					
+					if (gp.ui.commandNum == 3) {
+						gp.ui.titleScreenState = 0;
+						gp.ui.commandNum = 0;
+					}
+				}
+			}
+		}
+		
 //		Play state
 		if (gp.gameState == gp.playState) {
 			if (code == KeyEvent.VK_W) {
