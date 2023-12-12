@@ -14,6 +14,8 @@ import javax.imageio.ImageIO;
 import main.GamePanel;
 import main.KeyHandler;
 import main.UtilityTool;
+import object.OBJ_Shield_Wood;
+import object.OBJ_Sword_Normal;
 
 public class Player extends Entity {
 	KeyHandler keyH;
@@ -22,6 +24,7 @@ public class Player extends Entity {
 	public final int screenY;
 	
 	int standCounter = 0;
+	public boolean attackCanceled = false;
 	
 	public Player(GamePanel gp, KeyHandler keyH) {
 		super(gp);
@@ -56,6 +59,24 @@ public class Player extends Entity {
 //		Player status;
 		maxLife = 6;
 		life = maxLife;
+		level = 1;
+		strength = 1; // The more strength char has, the more dmg char does
+		dexterity = 1; // The higher it is, the less dmg received
+		exp = 0;
+		nextLevelExp = 5;
+		coin = 0;
+		currentWeapon = new OBJ_Sword_Normal(gp);
+		currentShield = new OBJ_Shield_Wood(gp);
+		attack = getAttack(); // decided by strength and weapon
+		defense = getDefense(); // decided by dexterity and shield
+	}
+	
+	public int getAttack() {
+		return attack = strength * currentWeapon.attackValue;
+	}
+	
+	public int getDefense() {
+		return defense = dexterity * currentShield.defenseValue;
 	}
 	
 	public void getPlayerImage() {
@@ -144,6 +165,13 @@ public class Player extends Entity {
 				}
 			}
 			
+			if (keyH.enterPressed == true && attackCanceled == false) {
+				gp.playSE(7);
+				attacking = true;
+				spriteCounter = 0;
+			}
+			
+			attackCanceled = false;
 			gp.keyH.enterPressed = false;
 			
 	//		Because we are using 144 FPS, so every 24 frames we'll re-draw the player once 
@@ -242,12 +270,14 @@ public class Player extends Entity {
 	public void interactNPC(int i) {
 		if (gp.keyH.enterPressed) {
 			if (i != 999) {
+				attackCanceled = true;
 				gp.gameState = gp.dialogueState;
 				gp.npc[i].speak();
-			} else {
-				gp.playSE(7);
-				attacking = true;
 			}
+//			else {
+//				gp.playSE(7);
+//				attacking = true;
+//			}
 		}
 //		gp.keyH.enterPressed = false;
 	}
