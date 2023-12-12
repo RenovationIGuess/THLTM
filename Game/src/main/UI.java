@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 
+import object.OBJ_Heart;
 import object.OBJ_Key;
+import object.SuperObject;
 
 public class UI {
 	GamePanel gp;
@@ -27,6 +29,9 @@ public class UI {
 	public String currentDialogue = "";
 	public int commandNum = 0;
 	public int titleScreenState = 0; // 0: first screen, 1: second screen
+	
+//	Character status
+	BufferedImage heart_full, heart_half, heart_blank;
 	
 	public UI(GamePanel gp) {
 		this.gp = gp;
@@ -47,6 +52,12 @@ public class UI {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+//		Create HUD object
+		SuperObject heart = new OBJ_Heart(gp);
+		heart_full = heart.image;
+		heart_half = heart.image2;
+		heart_blank = heart.image3;
 	}
 	
 	public void showMessage(String text) {
@@ -67,15 +78,48 @@ public class UI {
 		
 		if (gp.gameState == gp.playState) {
 //			TODO:
+			drawPlayerLife();
 		}
 		
 		if (gp.gameState == gp.pauseState) {
 //			TODO:
+			drawPlayerLife();
 			drawPauseScreen();
 		}
 		
 		if (gp.gameState == gp.dialogueState) {
+			drawPlayerLife();
 			drawDialogueScreen();
+		}
+	}
+	
+	public void drawPlayerLife() {
+//		gp.player.life = 3;
+		
+		int x = gp.tileSize / 2;
+		int y = gp.tileSize / 2;
+		int i = 0;
+		
+//		Draw Blank Heart
+		while (i < gp.player.maxLife / 2) {
+			g2.drawImage(heart_blank, x, y, null);
+			i++;
+			x += gp.tileSize;
+		}
+		
+		x = gp.tileSize / 2;
+		y = gp.tileSize / 2;
+		i = 0;
+		
+//		Draw currentLife
+		while (i < gp.player.life) {
+			g2.drawImage(heart_half, x, y, null);
+			i++;
+			if (i < gp.player.life) {
+				g2.drawImage(heart_full, x, y, null);
+			}
+			i++;
+			x += gp.tileSize;
 		}
 	}
 	
