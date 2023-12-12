@@ -19,7 +19,11 @@ public class Entity {
 //	1 and 2 are front and back
 //	0 is idle
 	public BufferedImage up0, up1, up2, down0, down1, down2, left0, left1, left2, right0, right1, right2;
-	public String direction;
+	public String direction = "down";
+	
+	public BufferedImage image, image2, image3;
+	public String name;
+	public boolean collision = false;
 	
 	public int spriteCounter = 0;
 	public int spriteNum = 1;
