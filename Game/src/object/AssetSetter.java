@@ -1,5 +1,6 @@
 package object;
 
+import entity.NPC_Merchant;
 import entity.NPC_OldMan;
 import main.GamePanel;
 import monster.MON_GreenSlime;
@@ -20,6 +21,21 @@ public class AssetSetter {
 		gp.obj[mapNum][i] = new OBJ_Key(gp);
 		gp.obj[mapNum][i].worldX = gp.tileSize * 25;
 		gp.obj[mapNum][i].worldY = gp.tileSize * 23;
+		
+		i++;
+		gp.obj[mapNum][i] = new OBJ_Door(gp);
+		gp.obj[mapNum][i].worldX = gp.tileSize * 14;
+		gp.obj[mapNum][i].worldY = gp.tileSize * 28;
+		
+		i++;
+		gp.obj[mapNum][i] = new OBJ_Door(gp);
+		gp.obj[mapNum][i].worldX = gp.tileSize * 12;
+		gp.obj[mapNum][i].worldY = gp.tileSize * 12;
+		
+		i++;
+		gp.obj[mapNum][i] = new OBJ_Key(gp);
+		gp.obj[mapNum][i].worldX = gp.tileSize * 21;
+		gp.obj[mapNum][i].worldY = gp.tileSize * 19;
 		
 		i++;
 		gp.obj[mapNum][i] = new OBJ_Key(gp);
@@ -57,6 +73,11 @@ public class AssetSetter {
 		gp.obj[mapNum][i].worldY = gp.tileSize * 21;
 		
 		i++;
+		gp.obj[mapNum][i] = new OBJ_Chest(gp, new OBJ_Key(gp));
+		gp.obj[mapNum][i].worldX = gp.tileSize * 37;
+		gp.obj[mapNum][i].worldY = gp.tileSize * 21;
+		
+		i++;
 		gp.obj[mapNum][i] = new OBJ_Potion_Red(gp);
 		gp.obj[mapNum][i].worldX = gp.tileSize * 22;
 		gp.obj[mapNum][i].worldY = gp.tileSize * 27;
@@ -80,29 +101,29 @@ public class AssetSetter {
 		gp.npc[mapNum][i].worldX = gp.tileSize * 21;
 		gp.npc[mapNum][i].worldY = gp.tileSize * 21;
 		
-		i++;
-		gp.npc[mapNum][i] = new NPC_OldMan(gp);
-		gp.npc[mapNum][i].worldX = gp.tileSize * 11;
-		gp.npc[mapNum][i].worldY = gp.tileSize * 21;
-		
-		i++;
-		gp.npc[mapNum][i] = new NPC_OldMan(gp);
-		gp.npc[mapNum][i].worldX = gp.tileSize * 31;
-		gp.npc[mapNum][i].worldY = gp.tileSize * 21;
-		
-		i++;
-		gp.npc[mapNum][i] = new NPC_OldMan(gp);
-		gp.npc[mapNum][i].worldX = gp.tileSize * 21;
-		gp.npc[mapNum][i].worldY = gp.tileSize * 11;
-		
-		i++;
-		gp.npc[mapNum][i] = new NPC_OldMan(gp);
-		gp.npc[mapNum][i].worldX = gp.tileSize * 21;
-		gp.npc[mapNum][i].worldY = gp.tileSize * 31;
+//		i++;
+//		gp.npc[mapNum][i] = new NPC_OldMan(gp);
+//		gp.npc[mapNum][i].worldX = gp.tileSize * 11;
+//		gp.npc[mapNum][i].worldY = gp.tileSize * 21;
+//		
+//		i++;
+//		gp.npc[mapNum][i] = new NPC_OldMan(gp);
+//		gp.npc[mapNum][i].worldX = gp.tileSize * 31;
+//		gp.npc[mapNum][i].worldY = gp.tileSize * 21;
+//		
+//		i++;
+//		gp.npc[mapNum][i] = new NPC_OldMan(gp);
+//		gp.npc[mapNum][i].worldX = gp.tileSize * 21;
+//		gp.npc[mapNum][i].worldY = gp.tileSize * 11;
+//		
+//		i++;
+//		gp.npc[mapNum][i] = new NPC_OldMan(gp);
+//		gp.npc[mapNum][i].worldX = gp.tileSize * 21;
+//		gp.npc[mapNum][i].worldY = gp.tileSize * 31;
 		
 		mapNum = 1;
 		i = 0;
-		gp.npc[mapNum][i] = new NPC_OldMan(gp);
+		gp.npc[mapNum][i] = new NPC_Merchant(gp);
 		gp.npc[mapNum][i].worldX = gp.tileSize * 12;
 		gp.npc[mapNum][i].worldY = gp.tileSize * 7;
 	}

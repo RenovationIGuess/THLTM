@@ -21,8 +21,6 @@ public class Player extends Entity {
 	
 	int standCounter = 0;
 	public boolean attackCanceled = false;
-	public ArrayList<Entity> inventory = new ArrayList<>();
-	public final int maxInventorySize = 20;
 	
 	public Player(GamePanel gp, KeyHandler keyH) {
 		super(gp);
@@ -54,7 +52,9 @@ public class Player extends Entity {
 		worldY = gp.tileSize * 21;
 //		worldX = gp.tileSize * 12;
 //		worldY = gp.tileSize * 13;
-		speed = 2;
+//		gp.currentMap = 1;
+		defaultSpeed = 3;
+		speed = defaultSpeed;
 		direction = "down";
 		
 //		Player status;
@@ -68,7 +68,7 @@ public class Player extends Entity {
 		dexterity = 1; // The higher it is, the less dmg received
 		exp = 0;
 		nextLevelExp = 5;
-		coin = 0;
+		coin = 1000;
 		currentWeapon = new OBJ_Sword_Normal(gp);
 		currentShield = new OBJ_Shield_Wood(gp);
 		projectile = new OBJ_Fireball(gp);
@@ -254,7 +254,12 @@ public class Player extends Entity {
 			projectile.subtractResource(this);
 			
 //			Add to the list
-			gp.projectileList.add(projectile);
+			for (int i = 0; i < gp.projectile[1].length; ++i) {
+				if (gp.projectile[gp.currentMap][i] == null) {
+					gp.projectile[gp.currentMap][i] = projectile;
+					break;
+				}
+			}
 			gp.playSE(10);
 			
 			shotAvailableCounter = 0;
@@ -326,11 +331,14 @@ public class Player extends Entity {
 			
 //			Check collision
 			int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
-			damageMonster(monsterIndex, attack);
+			damageMonster(monsterIndex, attack, currentWeapon.knockBackPower);
 			
 //			Check interactive collision
 			int iTileIndex = gp.cChecker.checkEntity(this, gp.iTile);
 			damageInteractiveTile(iTileIndex);
+			
+			int projectileIndex = gp.cChecker.checkEntity(this, gp.projectile);
+			damageProjectile(projectileIndex);
 			
 //			After check collision, restore data
 			worldX = currentWorldX;
@@ -342,6 +350,14 @@ public class Player extends Entity {
 			spriteNum = 1;
 			spriteCounter = 0;
 			attacking = false;
+		}
+	}
+	
+	public void damageProjectile(int i) {
+		if (i != 999) {
+			Entity projectile = gp.projectile[gp.currentMap][i];
+			projectile.alive = false;
+			generateParticle(projectile, projectile);
 		}
 	}
 	
@@ -371,7 +387,14 @@ public class Player extends Entity {
 			if (gp.obj[gp.currentMap][i].type == type_pickUpOnly) {
 				gp.obj[gp.currentMap][i].use(this);
 				gp.obj[gp.currentMap][i] = null;
-			} else {
+			} 
+			else if (gp.obj[gp.currentMap][i].type == type_obstacle) {
+				if (keyH.enterPressed == true) {
+					attackCanceled = true;
+					gp.obj[gp.currentMap][i].interact();
+				}
+			}
+ 			else {
 				String text;
 			
 				if (inventory.size() != maxInventorySize) {
@@ -420,11 +443,15 @@ public class Player extends Entity {
 		}
 	}
 	
-	public void damageMonster(int i, int attack) {
+	public void damageMonster(int i, int attack, int knockBackPower) {
 		if (i != 999) {
 //			System.out.println("HIT!");
 			if (gp.monster[gp.currentMap][i].invincible == false) {				
 				gp.playSE(5);
+				
+				if (knockBackPower > 0) {
+					knockBack(gp.monster[gp.currentMap][i], knockBackPower);
+				}
 				
 				int damage = attack - gp.monster[gp.currentMap][i].defense;
 				
@@ -452,6 +479,13 @@ public class Player extends Entity {
 		}
 	}
 	
+	public void knockBack(Entity entity, int knockBackPower) {
+		entity.direction = direction;
+		entity.speed += knockBackPower;
+		entity.knockBack = true;
+		
+	}
+	
 	public void checkLevelUp() {
 		if (exp >= nextLevelExp) {
 			level++;
@@ -469,7 +503,7 @@ public class Player extends Entity {
 	}
 	
 	public void selectItem() {
-		int itemIndex = gp.ui.getItemIndexOnSlot();
+		int itemIndex = gp.ui.getItemIndexOnSlot(gp.ui.playerSlotCol, gp.ui.playerSlotRow);
 		
 		if (itemIndex < inventory.size()) {
 			Entity selectedItem = inventory.get(itemIndex);
@@ -485,8 +519,9 @@ public class Player extends Entity {
 			
 			if (selectedItem.type == type_consumable) {
 //				TODO:
-				selectedItem.use(this);
-				inventory.remove(itemIndex);
+				if (selectedItem.use(this) == true) {
+					inventory.remove(itemIndex);
+				}
 			}
 		}
 	}

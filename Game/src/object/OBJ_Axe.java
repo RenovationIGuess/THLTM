@@ -14,5 +14,7 @@ public class OBJ_Axe extends Entity {
 		attackArea.width = 30;
 		attackArea.height = 30;
 		description = "[Woodcutter's Axe]\nOld but gold.";
+		price = 75;
+		knockBackPower = 10;
 	}
 }
