@@ -1,20 +1,14 @@
 package entity;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Font;
-//import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.KeyHandler;
-import main.UtilityTool;
+import object.OBJ_Fireball;
 import object.OBJ_Key;
 import object.OBJ_Shield_Wood;
 import object.OBJ_Sword_Normal;
@@ -65,6 +59,9 @@ public class Player extends Entity {
 		maxLife = 6;
 		life = maxLife;
 		level = 1;
+		ammo = 10;
+		maxMana = 4;
+		mana = maxMana;
 		strength = 1; // The more strength char has, the more dmg char does
 		dexterity = 1; // The higher it is, the less dmg received
 		exp = 0;
@@ -72,6 +69,7 @@ public class Player extends Entity {
 		coin = 0;
 		currentWeapon = new OBJ_Sword_Normal(gp);
 		currentShield = new OBJ_Shield_Wood(gp);
+		projectile = new OBJ_Fireball(gp);
 		attack = getAttack(); // decided by strength and weapon
 		defense = getDefense(); // decided by dexterity and shield
 	}
@@ -226,6 +224,20 @@ public class Player extends Entity {
 			}
 		}
 		
+		if (gp.keyH.shotKeyPressed == true && projectile.alive == false && shotAvailableCounter == 72 && projectile.haveResource(this)) {
+//			Set default coordinates, direction and user
+			projectile.set(worldX, worldY, direction, true, this);
+			
+//			Subtract cost
+			projectile.subtractResource(this);
+			
+//			Add to the list
+			gp.projectileList.add(projectile);
+			gp.playSE(10);
+			
+			shotAvailableCounter = 0;
+		}
+		
 //		This needs to be outside of key if statement!
 		if (invincible == true) {
 			invincibleCounter++;
@@ -233,6 +245,10 @@ public class Player extends Entity {
 				invincible = false;
 				invincibleCounter = 0;
 			}
+		}
+		
+		if (shotAvailableCounter < 72) {
+			shotAvailableCounter++;
 		}
 	}
 	
@@ -273,7 +289,7 @@ public class Player extends Entity {
 			
 //			Check collision
 			int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
-			damageMonster(monsterIndex);
+			damageMonster(monsterIndex, attack);
 			
 //			After check collision, restore data
 			worldX = currentWorldX;
@@ -324,7 +340,7 @@ public class Player extends Entity {
 	
 	public void contactMonster(int i) {
 		if (i != 999) {
-			if (invincible == false) {
+			if (invincible == false && gp.monster[i].dying == false) {
 				gp.playSE(6);
 				
 				int damage = gp.monster[i].attack - defense;
@@ -339,7 +355,7 @@ public class Player extends Entity {
 		}
 	}
 	
-	public void damageMonster(int i) {
+	public void damageMonster(int i, int attack) {
 		if (i != 999) {
 //			System.out.println("HIT!");
 			if (gp.monster[i].invincible == false) {				
