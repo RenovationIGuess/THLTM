@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import ai.PathFinder;
 import entity.Entity;
 import entity.Player;
+import environment.EnvironmentManager;
 import object.AssetSetter;
 import object.SuperObject;
 import tile_interactive.InteractiveTile;
@@ -66,6 +67,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public EventHandler eHandler = new EventHandler(this);
 	Config config = new Config(this);
 	public PathFinder pFinder = new PathFinder(this);
+	EnvironmentManager eManager = new EnvironmentManager(this);
 	Thread gameThread;
 	
 //	Entity and object
@@ -89,6 +91,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public final int gameOverState = 6;
 	public final int transitionState = 7;
 	public final int tradeState = 8;
+	public final int sleepState = 9;
 	
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -103,6 +106,8 @@ public class GamePanel extends JPanel implements Runnable {
 		aSetter.setNPC();
 		aSetter.setMonster();
 		aSetter.setInteractiveTile();
+		
+		eManager.setup();
 		
 //		playMusic(0);
 		
@@ -236,6 +241,8 @@ public class GamePanel extends JPanel implements Runnable {
 					iTile[currentMap][i].update();
 				}
 			}
+			
+			eManager.update();
 		}
 		if (gameState == pauseState) {
 			
@@ -314,6 +321,9 @@ public class GamePanel extends JPanel implements Runnable {
 			
 //			Empty list
 			entityList.clear();
+			
+//			Environment
+			eManager.draw(g2);
 			
 //			UI
 			ui.draw(g2);	
