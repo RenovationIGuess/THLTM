@@ -125,7 +125,7 @@ void menu()
             printf("%d. %s\n", i + 1, menu_options[i]);
         }
         printf("Your choice (1-8, other to quit): ");
-        fflush(stdin);
+        custom_fflush_stdin();
         scanf("%d", &option);
         handle_option(option);
         // printf("You entered: %d\n", option);
