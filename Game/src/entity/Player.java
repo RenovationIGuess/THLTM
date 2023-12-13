@@ -170,6 +170,9 @@ public class Player extends Entity {
 			int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
 			contactMonster(monsterIndex);
 			
+//			Check interactive tile collision
+			int iTileIndex = gp.cChecker.checkEntity(this, gp.iTile);
+			
 //			Check event
 			gp.eHandler.checkEvent();
 			
@@ -224,7 +227,11 @@ public class Player extends Entity {
 			}
 		}
 		
-		if (gp.keyH.shotKeyPressed == true && projectile.alive == false && shotAvailableCounter == 72 && projectile.haveResource(this)) {
+		if (gp.keyH.shotKeyPressed == true && 
+				projectile.alive == false && 
+				shotAvailableCounter == 72 && 
+				projectile.haveResource(this)) 
+		{
 //			Set default coordinates, direction and user
 			projectile.set(worldX, worldY, direction, true, this);
 			
@@ -249,6 +256,14 @@ public class Player extends Entity {
 		
 		if (shotAvailableCounter < 72) {
 			shotAvailableCounter++;
+		}
+		
+		if (life > maxLife) {
+			life = maxLife;
+		}
+		
+		if (mana > maxMana) {
+			mana = maxMana;
 		}
 	}
 	
@@ -291,6 +306,10 @@ public class Player extends Entity {
 			int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
 			damageMonster(monsterIndex, attack);
 			
+//			Check interactive collision
+			int iTileIndex = gp.cChecker.checkEntity(this, gp.iTile);
+			damageInteractiveTile(iTileIndex);
+			
 //			After check collision, restore data
 			worldX = currentWorldX;
 			worldY = currentWorldY;
@@ -304,22 +323,46 @@ public class Player extends Entity {
 		}
 	}
 	
+	public void damageInteractiveTile(int i) {
+		if (i != 999 && 
+				gp.iTile[i].destructible && 
+				gp.iTile[i].isCorrectItem(this) &&
+				gp.iTile[i].invincible == false) 
+		{
+			gp.iTile[i].playSE();
+			gp.iTile[i].life--;
+			gp.iTile[i].invincible = true;
+			
+//			Generate particle
+			generateParticle(gp.iTile[i], gp.iTile[i]);
+			
+			if (gp.iTile[i].life <= 0) {
+				gp.iTile[i] = gp.iTile[i].getDestroyedItem();
+			}
+		}
+	}
+	
 	public void pickUpObject(int i) {
 //		Didn't touch any object <=> i == 999
 		if (i != 999) {
 //			TODO:
-			String text;
-			
-			if (inventory.size() != maxInventorySize) {
-				inventory.add(gp.obj[i]);
-				gp.playSE(1);
-				text = "You picked up " + gp.obj[i].name + "!";
+			if (gp.obj[i].type == type_pickUpOnly) {
+				gp.obj[i].use(this);
+				gp.obj[i] = null;
 			} else {
-				text = "Your inventory is full!";
-			}
+				String text;
 			
-			gp.ui.addMessage(text);
-			gp.obj[i] = null;
+				if (inventory.size() != maxInventorySize) {
+					inventory.add(gp.obj[i]);
+					gp.playSE(1);
+					text = "You picked up " + gp.obj[i].name + "!";
+				} else {
+					text = "Your inventory is full!";
+				}
+				
+				gp.ui.addMessage(text);
+				gp.obj[i] = null;
+			}
 		}
 	}
 	
