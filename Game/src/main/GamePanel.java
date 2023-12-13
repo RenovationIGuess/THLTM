@@ -14,6 +14,7 @@ import java.util.Comparator;
 
 import javax.swing.JPanel;
 
+import ai.PathFinder;
 import entity.Entity;
 import entity.Player;
 import object.AssetSetter;
@@ -55,7 +56,7 @@ public class GamePanel extends JPanel implements Runnable {
 //	FPS
 	int FPS = 144;
 	
-	TileManager tileM = new TileManager(this);
+	public TileManager tileM = new TileManager(this);
 	public KeyHandler keyH = new KeyHandler(this);
 	Sound music = new Sound();
 	Sound se = new Sound();
@@ -64,6 +65,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public UI ui = new UI(this);
 	public EventHandler eHandler = new EventHandler(this);
 	Config config = new Config(this);
+	public PathFinder pFinder = new PathFinder(this);
 	Thread gameThread;
 	
 //	Entity and object
@@ -74,7 +76,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public InteractiveTile iTile[][] = new InteractiveTile[maxMap][50];
 	ArrayList<Entity> entityList = new ArrayList<>();
 	public ArrayList<Entity> particleList = new ArrayList<>();
-	public ArrayList<Entity> projectileList = new ArrayList<>();
+	public Entity projectile[][] = new Entity[maxMap][20];
 	
 //	GAME STATE
 	public int gameState;
@@ -85,6 +87,8 @@ public class GamePanel extends JPanel implements Runnable {
 	public final int characterState = 4;
 	public final int optionsState = 5;
 	public final int gameOverState = 6;
+	public final int transitionState = 7;
+	public final int tradeState = 8;
 	
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -205,13 +209,13 @@ public class GamePanel extends JPanel implements Runnable {
 				}
 			}
 			
-			for (int i = 0; i < projectileList.size(); ++i) {
-				if (projectileList.get(i) != null) {
-					if (projectileList.get(i).alive == true) {
-						projectileList.get(i).update();
+			for (int i = 0; i < projectile[1].length; ++i) {
+				if (projectile[currentMap][i] != null) {
+					if (projectile[currentMap][i].alive == true) {
+						projectile[currentMap][i].update();
 					}
-					if (projectileList.get(i).alive == false) {
-						projectileList.remove(i);
+					if (projectile[currentMap][i].alive == false) {
+						projectile[currentMap][i] = null;
 					}
 				}
 			}
@@ -282,9 +286,9 @@ public class GamePanel extends JPanel implements Runnable {
 				}
 			}
 			
-			for (int i = 0; i < projectileList.size(); ++i) {
-				if (projectileList.get(i) != null) {
-					entityList.add(projectileList.get(i));
+			for (int i = 0; i < projectile[1].length; ++i) {
+				if (projectile[currentMap][i] != null) {
+					entityList.add(projectile[currentMap][i]);
 				}
 			}
 			
