@@ -21,6 +21,7 @@ public class Player extends Entity {
 	
 	int standCounter = 0;
 	public boolean attackCanceled = false;
+	public boolean lightUpdated = false;
 	
 	public Player(GamePanel gp, KeyHandler keyH) {
 		super(gp);
@@ -53,7 +54,7 @@ public class Player extends Entity {
 //		worldX = gp.tileSize * 12;
 //		worldY = gp.tileSize * 13;
 //		gp.currentMap = 1;
-		defaultSpeed = 3;
+		defaultSpeed = 2;
 		speed = defaultSpeed;
 		direction = "down";
 		
@@ -116,6 +117,20 @@ public class Player extends Entity {
 		
 		right1 = setup("/player/boy_right_1", gp.tileSize, gp.tileSize);
 		right2 = setup("/player/boy_right_2", gp.tileSize, gp.tileSize);
+	}
+	
+	public void getSleepingImage(BufferedImage image) {
+		up1 = image;
+		up2 = image;
+		
+		down1 = image;
+		down2 = image;
+		
+		left1 = image;
+		left2 = image;
+		
+		right1 = image;
+		right2 = image;
 	}
 	
 	public void getPlayerAttackImage() {
@@ -396,12 +411,12 @@ public class Player extends Entity {
 			}
  			else {
 				String text;
-			
-				if (inventory.size() != maxInventorySize) {
-					inventory.add(gp.obj[gp.currentMap][i]);
+				
+				if (canObtainItem(gp.obj[gp.currentMap][i])) {
 					gp.playSE(1);
 					text = "You picked up " + gp.obj[gp.currentMap][i].name + "!";
-				} else {
+				}
+				else {
 					text = "Your inventory is full!";
 				}
 				
@@ -517,13 +532,67 @@ public class Player extends Entity {
 				defense = getDefense();
 			}
 			
+			if (selectedItem.type == type_light) {
+				if (currentLight == selectedItem) {
+					currentLight = null;
+				} 
+				else {
+					currentLight = selectedItem;
+				}
+				lightUpdated = true;
+			}
+			
 			if (selectedItem.type == type_consumable) {
 //				TODO:
 				if (selectedItem.use(this) == true) {
-					inventory.remove(itemIndex);
+					if (selectedItem.amount > 1) {
+						selectedItem.amount--;
+					} else inventory.remove(itemIndex);
 				}
 			}
 		}
+	}
+	
+	public int searchItemInInventory(String itemName) {
+		int itemIndex = 999;
+		
+		for (int i = 0; i < inventory.size(); ++i) {
+			if (inventory.get(i).name.equals(itemName)) {
+				itemIndex = i;
+				break;
+			}
+		}
+		
+		return itemIndex;
+	}
+	
+	public boolean canObtainItem(Entity item) {
+		boolean canObtain = false;
+		
+//		Check if stackable
+		if (item.stackable == true) {
+			int index = searchItemInInventory(item.name);
+			if (index != 999) {
+				inventory.get(index).amount++;
+				canObtain = true;
+			}
+			else {
+//				New item - check vacancy
+				if (inventory.size() != maxInventorySize) {
+					inventory.add(item);
+					canObtain = true;
+				}
+			}
+		}
+		else {
+//			Not stackable
+			if (inventory.size() != maxInventorySize) {
+				inventory.add(item);
+				canObtain = true;
+			}
+		}
+		
+		return canObtain;
 	}
 	
 	public void draw(Graphics2D g2) {

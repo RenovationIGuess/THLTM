@@ -23,8 +23,6 @@ public class UI {
 	Font maruMonica, purisaB;
 	Font arial_40, arial_80B;
 	public boolean messageOn = false;
-//	public String message = "";
-//	int messageCounter = 0;
 	ArrayList<String> message = new ArrayList<>();
 	ArrayList<Integer> messageCounter = new ArrayList<>();
 	public boolean gameFinished = false;
@@ -133,6 +131,11 @@ public class UI {
 		
 		if (gp.gameState == gp.tradeState) {
 			drawTradeScreen();
+		}
+		
+//		Sleep state
+		if (gp.gameState == gp.sleepState) {
+			drawSleepScreen();
 		}
 	}
 	
@@ -471,13 +474,33 @@ public class UI {
 		for (int i = 0; i < entity.inventory.size(); ++i) {
 //			Equip cursor
 			if (entity.inventory.get(i) == entity.currentWeapon ||
-					entity.inventory.get(i) == entity.currentShield) 
+					entity.inventory.get(i) == entity.currentShield ||
+					entity.inventory.get(i) == entity.currentLight) 
 			{
 				g2.setColor(new Color(240, 190, 90));
 				g2.fillRoundRect(slotX, slotY, gp.tileSize, gp.tileSize, 10, 10);
 			}
 			
 			g2.drawImage(entity.inventory.get(i).down1, slotX, slotY, null);
+			
+//			display amount
+			if (entity == gp.player && entity.inventory.get(i).amount > 1) {
+				g2.setFont(g2.getFont().deriveFont(32f));
+				int amountX;
+				int amountY;
+				
+				String s = "" + entity.inventory.get(i).amount;
+				amountX = getXForAlignToRightText(s, slotX + 44);
+				amountY = slotY + gp.tileSize;
+				
+//				Shadow
+				g2.setColor(new Color(60, 60, 60));
+				g2.drawString(s, amountX, amountY);
+				
+//				Number
+				g2.setColor(Color.white);
+				g2.drawString(s, amountX - 3, amountY - 3);
+			}
 			
 			slotX += slotSize;
 			
@@ -982,14 +1005,14 @@ public class UI {
 					currentDialogue = "You need more coin to buy that.";
 					drawDialogueScreen();
 				}
-				else if (gp.player.inventory.size() == gp.player.maxInventorySize) {
-					subState = 0;
-					gp.gameState = gp.dialogueState;
-					currentDialogue = "Your inventory is full!";
-				}
 				else {
-					gp.player.coin -= npc.inventory.get(itemIndex).price;
-					gp.player.inventory.add(npc.inventory.get(itemIndex));
+					if (gp.player.canObtainItem(npc.inventory.get(itemIndex)) == true) {
+						gp.player.coin -= npc.inventory.get(itemIndex).price;
+					} else {
+						subState = 0;
+						gp.gameState = gp.dialogueState;
+						currentDialogue = "Your inventory is full!";
+					}
 				}
 			}
 		}
@@ -1043,9 +1066,38 @@ public class UI {
 					currentDialogue = "You cannot sell your equipped item!";
 				}
 				else {
-					gp.player.inventory.remove(itemIndex);
+					if (gp.player.inventory.get(itemIndex).amount > 1) {
+						gp.player.inventory.get(itemIndex).amount--;
+					}
+					else {
+						gp.player.inventory.remove(itemIndex);
+					}
 					gp.player.coin += price;
 				}
+			}
+		}
+	}
+	
+	public void drawSleepScreen() {
+		counter++;
+		
+		if (counter < 144 * 2) {
+			gp.eManager.lightning.filterAlpha += 0.01f;
+			
+			if (gp.eManager.lightning.filterAlpha > 1f) {
+				gp.eManager.lightning.filterAlpha = 1f;
+			}
+		}
+		
+		if (counter >= 144 * 2) {
+			gp.eManager.lightning.filterAlpha -= 0.01f;
+			if (gp.eManager.lightning.filterAlpha <= 0f) {
+				gp.eManager.lightning.filterAlpha = 0f;
+				counter = 0;
+				gp.eManager.lightning.dayState = gp.eManager.lightning.day;
+				gp.eManager.lightning.dayCounter = 0;
+				gp.gameState = gp.playState;
+				gp.player.getPlayerImage();
 			}
 		}
 	}
