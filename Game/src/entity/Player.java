@@ -428,7 +428,7 @@ public class Player extends Entity {
 					gp.monster[gp.currentMap][i].dying = true;
 					gp.ui.addMessage("You killed " + gp.monster[gp.currentMap][i].name + "!");
 					exp += gp.monster[gp.currentMap][i].exp;
-					gp.ui.addMessage("You gained " + gp.monster[gp.currentMap][i].exp + "exp!");
+					gp.ui.addMessage("You gained " + gp.monster[gp.currentMap][i].exp + " exp!");
 					checkLevelUp();
 				}
 			}
