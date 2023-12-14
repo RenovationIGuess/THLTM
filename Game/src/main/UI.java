@@ -20,8 +20,8 @@ import entity.Entity;
 public class UI {
 	GamePanel gp;
 	Graphics2D g2;
-	Font maruMonica, purisaB;
-	Font arial_40, arial_80B;
+	public Font maruMonica, purisaB;
+	public Font arial_40, arial_80B;
 	public boolean messageOn = false;
 	ArrayList<String> message = new ArrayList<>();
 	ArrayList<Integer> messageCounter = new ArrayList<>();
@@ -755,7 +755,8 @@ public class UI {
 //			TITLE NAME
 			g2.setFont(g2.getFont().deriveFont(Font.BOLD, 96F));
 			
-			String text = "Blue Boy Adventure";
+//			String text = "Blue Boy Adventure";
+			String text = "Tram Cam LTM";
 			
 			int x = getXForCenteredText(text);
 			int y = gp.tileSize * 3;

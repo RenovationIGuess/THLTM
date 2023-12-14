@@ -21,6 +21,7 @@ import environment.EnvironmentManager;
 import object.AssetSetter;
 import object.SuperObject;
 import tile_interactive.InteractiveTile;
+import tiles.Map;
 import tiles.TileManager;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -68,6 +69,7 @@ public class GamePanel extends JPanel implements Runnable {
 	Config config = new Config(this);
 	public PathFinder pFinder = new PathFinder(this);
 	EnvironmentManager eManager = new EnvironmentManager(this);
+	Map map = new Map(this);
 	Thread gameThread;
 	
 //	Entity and object
@@ -92,6 +94,7 @@ public class GamePanel extends JPanel implements Runnable {
 	public final int transitionState = 7;
 	public final int tradeState = 8;
 	public final int sleepState = 9;
+	public final int mapState = 10;
 	
 	public GamePanel() {
 		this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -260,6 +263,10 @@ public class GamePanel extends JPanel implements Runnable {
 		if (gameState == titleState) {
 			ui.draw(g2);
 		}
+//		Map screen
+		else if (gameState == mapState) {
+			map.drawFullMapScreen(g2);
+		}
 //		OTHERS
 		else {
 //			TILE
@@ -325,6 +332,9 @@ public class GamePanel extends JPanel implements Runnable {
 //			Environment
 			eManager.draw(g2);
 			
+//			Minimap
+			map.drawMiniMap(g2);
+			
 //			UI
 			ui.draw(g2);	
 		}
@@ -356,117 +366,6 @@ public class GamePanel extends JPanel implements Runnable {
 			System.out.println("Draw time: " + passed);
 		}
 	}
-	
-//	public void paintComponent(Graphics g) {
-//		super.paintComponent(g);
-//		
-//		Graphics2D g2 = (Graphics2D)g;
-//		
-////		DEBUG
-//		long drawStart = 0;
-//		if (keyH.showDebugText == true) {
-//			drawStart = System.nanoTime();
-//		}
-//		
-////		TITLE SCREEN
-//		if (gameState == titleState) {
-//			ui.draw(g2);
-//		}
-////		OTHERS
-//		else {
-////			TILE
-//			tileM.draw(g2);
-//			
-////			Interactive tile
-//			for (int i = 0; i < iTile.length; ++i) {
-//				if (iTile[i] != null) {
-//					iTile[i].draw(g2);
-//				}
-//			}
-//		
-////			ADD ENTITIES TO LIST
-//			entityList.add(player);
-//			
-//			for (int i = 0; i < npc.length; ++i) {
-//				if (npc[i] != null) {
-//					entityList.add(npc[i]);
-//				}
-//			}
-//			
-//			for (int i = 0; i < obj.length; ++i) {
-//				if (obj[i] != null) {
-//					entityList.add(obj[i]);
-//				}
-//			}
-//			
-//			for (int i = 0; i < monster.length; ++i) {
-//				if (monster[i] != null) {
-//					entityList.add(monster[i]);
-//				}
-//			}
-//			
-//			for (int i = 0; i < projectileList.size(); ++i) {
-//				if (projectileList.get(i) != null) {
-//					entityList.add(projectileList.get(i));
-//				}
-//			}
-//			
-//			for (int i = 0; i < particleList.size(); ++i) {
-//				if (particleList.get(i) != null) {
-//					entityList.add(particleList.get(i));
-//				}
-//			}
-//			
-////			Sort
-//			Collections.sort(entityList, new Comparator<Entity>() {
-//				@Override
-//				public int compare(Entity e1, Entity e2) {
-//					int result = Integer.compare(e1.worldY, e2.worldY);
-//					return result;
-//				}
-//			});
-//			
-////			Draw entities
-//			for (int i = 0; i < entityList.size(); ++i) {
-//				entityList.get(i).draw(g2);
-//			}
-//			
-////			Empty list
-//			entityList.clear();
-//			
-////			UI
-//			ui.draw(g2);	
-//		}
-//		
-////		DEBUG
-//		if (keyH.showDebugText == true) {
-//			long drawEnd = System.nanoTime();
-//			long passed = drawEnd - drawStart;
-//			g2.setFont(new Font("Arial", Font.PLAIN, 20));
-//			g2.setColor(Color.white);
-//			
-//			int x = 10;
-//			int y = 400;
-//			int lineHeight = 24;
-//			
-//			g2.drawString("World X: " + player.worldX, x, y);
-//			y += lineHeight;
-//			
-//			g2.drawString("World Y: " + player.worldY, x, y);
-//			y += lineHeight;
-//			
-//			g2.drawString("Col: " + (player.worldX + player.solidArea.x) / tileSize, x, y);
-//			y += lineHeight;
-//			
-//			g2.drawString("Row: " + (player.worldX + player.solidArea.y) / tileSize, x, y);
-//			y += lineHeight;
-//			
-//			g2.drawString("Draw time: " + passed, x, y);
-//			System.out.println("Draw time: " + passed);
-//		}
-//		
-//		g2.dispose();
-//	}
 	
 	public void drawToScreen() {
 		Graphics g = getGraphics();
