@@ -92,13 +92,14 @@ public class Lightning {
 		if (dayState == day) {
 			dayCounter++;
 			
-			if (dayCounter > 144 * 5) {
+			if (dayCounter > 144 * 60 * 5) {
 				dayState = dusk;
 				dayCounter = 0;
 			}
 		}
 		
 		if (dayState == dusk) {
+//			1000 frames => change <=> 1000/144 = 6.xx(s)
 			filterAlpha += 0.001f;
 			
 			if (filterAlpha > 1f) {
@@ -110,7 +111,7 @@ public class Lightning {
 		if (dayState == night) {
 			dayCounter++;
 			
-			if (dayCounter > 144 * 5) {
+			if (dayCounter > 144 * 60 * 5) {
 				dayState = dawn;
 				dayCounter = 0;
 			}
