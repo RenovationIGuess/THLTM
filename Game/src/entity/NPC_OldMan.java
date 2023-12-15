@@ -20,6 +20,8 @@ public class NPC_OldMan extends Entity {
 		solidArea.width = 30;
 		solidArea.height = 30;
 		
+		dialogueSet = 0;
+		
 		getImage();
 		setDialogue();
 	}
@@ -39,19 +41,25 @@ public class NPC_OldMan extends Entity {
 	}
 	
 	public void setDialogue() {
-		dialogues[0] = "Hello, young man.";
-		dialogues[1] = "So you also come to this island to find the \ntreasure?";
-		dialogues[2] = "I used to be a great wizard but now... \nI'm a bit too old for taking an adventure.";
-		dialogues[3] = "Haizz, good luck on you...";
+		dialogues[0][0] = "Hello, young man.";
+		dialogues[0][1] = "So you also come to this island to find the \ntreasure?";
+		dialogues[0][2] = "I used to be a great wizard but now... \nI'm a bit too old for taking an adventure.";
+		dialogues[0][3] = "Haizz, good luck on you...";
+
+		dialogues[1][0] = "If you're tired, rest at the lake.";
+		dialogues[1][1] = "However, the monsters will reappear if you do so.\nI don't know why but it is what it is.";
+		dialogues[1][2] = "In any case, don't push yourself too hard, yound man.";
+
+		dialogues[2][0] = "I wonder how to open that door...";
 	}
 	
 	public void setAction() {
 		if (onPath == true) {
-//			int goalCol = 12;
-//			int goalRow = 9;
-			int goalCol = (gp.player.worldX + gp.player.solidArea.x)/gp.tileSize;
-			int goalRow = (gp.player.worldY + gp.player.solidArea.y)/gp.tileSize;
-			searchPath(goalCol, goalRow);
+			int goalCol = 12;
+			int goalRow = 9;
+//			int goalCol = (gp.player.worldX + gp.player.solidArea.x)/gp.tileSize;
+//			int goalRow = (gp.player.worldY + gp.player.solidArea.y)/gp.tileSize;
+//			searchPath(goalCol, goalRow);
 		}
 		else {
 			actionLockCounter++;
@@ -81,8 +89,20 @@ public class NPC_OldMan extends Entity {
 	}
 	
 	public void speak() {
-		super.speak();
+		facePlayer();
 		
-		onPath = true;
+		if (gp.player.life < gp.player.maxLife / 3) {
+			dialogueSet = 1;
+		}
+		
+		startDialogue(this, dialogueSet);
+		
+		if (dialogueSet == 0) {
+			dialogueSet = 2;
+			onPath = true;
+		}
+		else {
+			dialogueSet = 0;
+		}
 	}
 }

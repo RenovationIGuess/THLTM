@@ -56,6 +56,13 @@ public class GamePanel extends JPanel implements Runnable {
 	public final int worldWidth = tileSize * maxWorldCol;
 	public final int worldHeight = tileSize * maxWorldRow;
 	
+//	Area
+	public int currentArea;
+	public int nextArea;
+	public final int outside = 50;
+	public final int indoor = 51;
+	public final int dungeon = 52;
+	
 //	FPS
 	int FPS = 144;
 	
@@ -72,6 +79,7 @@ public class GamePanel extends JPanel implements Runnable {
 	EnvironmentManager eManager = new EnvironmentManager(this);
 	Map map = new Map(this);
 	SaveLoad saveLoad = new SaveLoad(this);
+	public EntityGenerator eGenerator = new EntityGenerator(this);
 	Thread gameThread;
 	
 //	Entity and object
@@ -114,9 +122,8 @@ public class GamePanel extends JPanel implements Runnable {
 		
 		eManager.setup();
 		
-//		playMusic(0);
-		
 		gameState = titleState;
+		currentArea = outside;
 		
 		tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
 		g2 = (Graphics2D)tempScreen.getGraphics();
@@ -124,12 +131,12 @@ public class GamePanel extends JPanel implements Runnable {
 		if (fullScreenOn) {
 			setFullScreen();
 		}
-//		stopMusic();
 	}
 	
 	public void resetGame(boolean restart) {
 		player.setDefaultPositions();
 		player.restoreStatus();
+		player.resetCounter();
 		aSetter.setNPC();
 		aSetter.setMonster();
 		
@@ -359,7 +366,7 @@ public class GamePanel extends JPanel implements Runnable {
 			g2.drawString("Col: " + (player.worldX + player.solidArea.x) / tileSize, x, y);
 			y += lineHeight;
 			
-			g2.drawString("Row: " + (player.worldX + player.solidArea.y) / tileSize, x, y);
+			g2.drawString("Row: " + (player.worldY + player.solidArea.y) / tileSize, x, y);
 			y += lineHeight;
 			
 			g2.drawString("Draw time: " + passed, x, y);
@@ -387,5 +394,29 @@ public class GamePanel extends JPanel implements Runnable {
 	public void playSE(int i) {
 		se.setFile(i);
 		se.play();
+	}
+	
+	public void changeArea() {
+		if (nextArea != currentArea) {
+			stopMusic();
+			
+			if (nextArea == outside) {
+				playMusic(20);
+			}
+			
+			if (nextArea == indoor) {
+				playMusic(21);
+			}
+			
+			if (nextArea == dungeon) {
+				playMusic(22);
+			}
+			
+//			Reset puzzle
+			aSetter.setNPC();
+		}
+		
+		currentArea = nextArea;
+		aSetter.setMonster();
 	}
 }

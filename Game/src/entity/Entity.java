@@ -29,14 +29,16 @@ public class Entity {
 	public boolean collision = false;
 	public Rectangle solidArea = new Rectangle(0, 0, 48, 48);
 	public int solidAreaDefaultX, solidAreaDefaultY;
-	String dialogues[] = new String[20];
+	public String dialogues[][] = new String[20][20];
 	public Rectangle attackArea = new Rectangle(0, 0, 0, 0);
 	public Entity attacker;
+	public Entity linkedEntity;
 	
 //	State
 	public int worldX, worldY;
 	public String direction = "down";
-	int dialogueIndex = 0;
+	public int dialogueSet = 0;
+	public int dialogueIndex = 0;
 	public int spriteNum = 1;
 	public boolean collisionOn = false;
 	public boolean invincible = false;
@@ -102,6 +104,7 @@ public class Entity {
 	public boolean stackable = false;
 	public int amount = 1;
 	public int lightRadius;
+	public int durability = 100;
 	
 //	Type
 	public int type; // 0 - player, 1 = npc, 2 = monster
@@ -115,6 +118,7 @@ public class Entity {
 	public final int type_pickUpOnly = 7;
 	public final int type_obstacle = 8;
 	public final int type_light = 9;
+	public final int type_pickaxe = 10;
 	
 	public Entity(GamePanel gp) {
 		this.gp = gp;
@@ -169,6 +173,22 @@ public class Entity {
 		return goalRow;
 	}
 	
+	public void resetCounter() {
+		spriteCounter = 0;
+		actionLockCounter = 0;
+		invincibleCounter = 0;
+		shotAvailableCounter = 0;
+		dyingCounter = 0;
+		hpBarCounter = 0;
+		knockBackCounter = 0;
+		guardCounter = 0;
+		offBalanceCounter = 0;
+	}
+	
+	public void move(String direction) {
+		
+	}
+	
 	public void setLoot(Entity loot) {
 		
 	}
@@ -205,13 +225,11 @@ public class Entity {
 		}
 	}
 	
-	public void speak() {
-		if (dialogues[dialogueIndex] == null) {
-			dialogueIndex = 0;
-		}
-		gp.ui.currentDialogue = dialogues[dialogueIndex];
-		dialogueIndex++;
+	public void speak() {	
 		
+	}
+
+	public void facePlayer() {
 		switch (gp.player.direction) {
 		case "up":
 			direction = "down";
@@ -226,6 +244,12 @@ public class Entity {
 			direction = "left";
 			break;
 		}
+	}
+
+	public void startDialogue(Entity entity, int setNum) {
+		gp.gameState = gp.dialogueState;
+		gp.ui.npc = entity;
+		dialogueSet = setNum;
 	}
 	
 	public Color getParticleColor() {
@@ -589,6 +613,9 @@ public class Entity {
 					damage /= 3;
 					gp.playSE(15);
 				}
+
+//			Decrease durability
+				gp.player.currentShield.durability--;
 			}
 			else {
 //				Not guarding

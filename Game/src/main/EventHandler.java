@@ -6,10 +6,8 @@ import entity.Entity;
 
 public class EventHandler {
 	GamePanel gp;
-	
-//	Rectangle eventRect;
-//	int eventRectDefaultX, eventRectDefaultY;
 	EventRect eventRect[][][];
+	Entity eventMaster;
 	
 	int previousEventX, previousEventY;
 	boolean canTouchEvent = true;
@@ -17,6 +15,8 @@ public class EventHandler {
 	
 	public EventHandler(GamePanel gp) {
 		this.gp = gp;
+		
+		eventMaster = new Entity(gp);
 		
 		eventRect = new EventRect[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow];
 		
@@ -44,7 +44,13 @@ public class EventHandler {
 			}
 		}
 		
-		
+		setDialogue();
+	}
+	
+	public void setDialogue() {
+		eventMaster.dialogues[0][0] = "You fall into a pit!";
+		eventMaster.dialogues[1][0] = "You drink the water.\nYour HP & MP has been restored.\n(Progress has been saved)";
+		eventMaster.dialogues[1][1] = "Mhmm, good water :D.";
 	}
 	
 	public void checkEvent() {
@@ -59,34 +65,47 @@ public class EventHandler {
 		
 		if (canTouchEvent) {
 			if (hit(0, 23, 16, "right")) {
-	//			Event happens
+//				Event happens
 				damagePit(gp.dialogueState);
 			}
-			
-//			if (hit(0, 23, 16, "up")) {
-//	//			Event happens
-//				teleport(23, 16, gp.dialogueState);
-//			}
 			
 			else if (hit(0 ,23, 12, "up")) {
 				healingPool(gp.dialogueState);
 			}
 			
 			else if (hit(0, 10, 39, "any")) {
-				teleport(1, 12, 13);
+				teleport(1, 12, 13, gp.indoor);
 			}
 			
 			else if (hit(1, 12, 13, "any")) {
-				teleport(0, 10, 39);
+				teleport(0, 10, 39, gp.outside);
 			}
 			
 //			Hit the table
 			else if (hit(1, 12, 9, "up")) {
 				speak(gp.npc[1][0]);
 			}
+			
+//			Enter dungeon
+			else if (hit(0, 12, 9, "any")) {
+				teleport(2, 9, 41, gp.dungeon);
+			}
+			
+//			Go out
+			else if (hit(2, 9, 41, "any")) {
+				teleport(0, 12, 9, gp.outside);
+			}
+			
+//			To second floor
+			else if (hit(2, 8, 7, "any")) {
+				teleport(3, 26, 41, gp.dungeon);
+			}
+			
+//			Back to first floor from second floor
+			else if (hit(3, 26, 41, "any")) {
+				teleport(2, 8, 7, gp.dungeon);
+			}
 		}
-		
-		
 	}
 	
 //	Required direction
@@ -118,31 +137,22 @@ public class EventHandler {
 		return hit;
 	}
 	
-	public void teleport(int map, int col, int row) {
-//		gp.gameState = gameState;
-//		gp.ui.currentDialogue = "Teleported!";
+	public void teleport(int map, int col, int row, int area) {
 		gp.gameState = gp.transitionState;
 
+		gp.nextArea = area;
 		tempMap = map;
 		tempCol = col;
 		tempRow = row;
-		
-//		gp.currentMap = map;
-//		gp.player.worldX = gp.tileSize * col;
-//		gp.player.worldY = gp.tileSize * row;
-//		
-//		previousEventX = gp.player.worldX;
-//		previousEventY = gp.player.worldY;
-		
 		canTouchEvent = false;
 		
 		gp.playSE(13);
 	}
 	
 	public void damagePit(int gameState) {
-		gp.gameState = gameState;
+//		gp.gameState = gameState;
 		gp.playSE(6);
-		gp.ui.currentDialogue = "You fall into a pit!";
+		eventMaster.startDialogue(eventMaster, 0);
 		gp.player.life -= 1;
 		
 		canTouchEvent = false;
@@ -150,10 +160,11 @@ public class EventHandler {
 	
 	public void healingPool(int gameState) {
 		if (gp.keyH.enterPressed == true) {
-			gp.gameState = gameState;
+//			gp.gameState = gameState;
 			gp.player.attackCanceled = true;
 			gp.playSE(2);
-			gp.ui.currentDialogue = "You drink the water.\nYour HP & MP has been restored.\n(Progress has been saved)";
+			eventMaster.startDialogue(eventMaster, 1);
+			
 			gp.player.life = gp.player.maxLife;
 			gp.player.mana = gp.player.maxMana;
 			
