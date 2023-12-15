@@ -10,6 +10,7 @@ import main.GamePanel;
 import main.KeyHandler;
 import object.OBJ_Fireball;
 import object.OBJ_Key;
+import object.OBJ_Lantern;
 import object.OBJ_Shield_Wood;
 import object.OBJ_Sword_Normal;
 
@@ -46,11 +47,13 @@ public class Player extends Entity {
 	}
 	
 	public void setDefaultValues() {
-		worldX = gp.tileSize * 23;
-		worldY = gp.tileSize * 21;
+//		worldX = gp.tileSize * 23;
+//		worldY = gp.tileSize * 21;
 //		worldX = gp.tileSize * 12;
 //		worldY = gp.tileSize * 13;
-//		gp.currentMap = 1;
+		worldX = gp.tileSize * 40;
+		worldY = gp.tileSize * 40;
+		gp.currentMap = 2;
 		defaultSpeed = 2;
 		speed = defaultSpeed;
 		direction = "down";
@@ -70,6 +73,7 @@ public class Player extends Entity {
 		currentWeapon = new OBJ_Sword_Normal(gp);
 		currentShield = new OBJ_Shield_Wood(gp);
 		currentLight = null;
+//		currentLight = new OBJ_Lantern(gp);
 		projectile = new OBJ_Fireball(gp);
 		attack = getAttack(); // decided by strength and weapon
 		defense = getDefense(); // decided by dexterity and shield
@@ -78,6 +82,7 @@ public class Player extends Entity {
 		getAttackImage();
 		getGuardImage();
 		setItems();
+		setDialogue();
 	}
 	
 	public void setDefaultPositions() {
@@ -89,6 +94,7 @@ public class Player extends Entity {
 	public void restoreStatus() {
 		life = maxLife;
 		mana = maxMana;
+		speed = defaultSpeed;
 		invincible = false;
 		transparent = false;
 		attacking = false;
@@ -178,7 +184,8 @@ public class Player extends Entity {
 			
 			attackLeft1 = setup("/player/boy_attack_left_1", gp.tileSize * 2, gp.tileSize);
 			attackLeft2 = setup("/player/boy_attack_left_2", gp.tileSize * 2, gp.tileSize);
-		} else if (currentWeapon.type == type_axe) {
+		} 
+		else if (currentWeapon.type == type_axe) {
 			attackUp1 = setup("/player/boy_axe_up_1", gp.tileSize, gp.tileSize * 2);
 			attackUp2 = setup("/player/boy_axe_up_2", gp.tileSize, gp.tileSize * 2);
 			
@@ -191,6 +198,19 @@ public class Player extends Entity {
 			attackLeft1 = setup("/player/boy_axe_left_1", gp.tileSize * 2, gp.tileSize);
 			attackLeft2 = setup("/player/boy_axe_left_2", gp.tileSize * 2, gp.tileSize);
 		}
+		else if (currentWeapon.type == type_pickaxe) {
+			attackUp1 = setup("/player/boy_pick_up_1", gp.tileSize, gp.tileSize * 2);
+			attackUp2 = setup("/player/boy_pick_up_2", gp.tileSize, gp.tileSize * 2);
+			
+			attackDown1 = setup("/player/boy_pick_down_1", gp.tileSize, gp.tileSize * 2);
+			attackDown2 = setup("/player/boy_pick_down_2", gp.tileSize, gp.tileSize * 2);
+			
+			attackRight1 = setup("/player/boy_pick_right_1", gp.tileSize * 2, gp.tileSize);
+			attackRight2 = setup("/player/boy_pick_right_2", gp.tileSize * 2, gp.tileSize);
+			
+			attackLeft1 = setup("/player/boy_pick_left_1", gp.tileSize * 2, gp.tileSize);
+			attackLeft2 = setup("/player/boy_pick_left_2", gp.tileSize * 2, gp.tileSize);
+		}
 	}
 	
 	public void getGuardImage() {
@@ -198,6 +218,10 @@ public class Player extends Entity {
 		guardDown = setup("/player/boy_guard_down", gp.tileSize, gp.tileSize);
 		guardLeft = setup("/player/boy_guard_left", gp.tileSize, gp.tileSize);
 		guardRight = setup("/player/boy_guard_right", gp.tileSize, gp.tileSize);
+	}
+	
+	public void setDialogue() {
+		dialogues[0][0] = "You are level " + level + " now!\n" + "You feel stronger :))";
 	}
 	
 	public void update() {
@@ -423,6 +447,7 @@ public class Player extends Entity {
 			generateParticle(gp.iTile[gp.currentMap][i], gp.iTile[gp.currentMap][i]);
 			
 			if (gp.iTile[gp.currentMap][i].life <= 0) {
+				gp.iTile[gp.currentMap][i].checkDrop();
 				gp.iTile[gp.currentMap][i] = gp.iTile[gp.currentMap][i].getDestroyedItem();
 			}
 		}
@@ -460,18 +485,14 @@ public class Player extends Entity {
 	}
 	
 	public void interactNPC(int i) {
-		if (gp.keyH.enterPressed) {
-			if (i != 999) {
+		if (i != 999) {
+			if (gp.keyH.enterPressed) {
 				attackCanceled = true;
-				gp.gameState = gp.dialogueState;
 				gp.npc[gp.currentMap][i].speak();
 			}
-//			else {
-//				gp.playSE(7);
-//				attacking = true;
-//			}
+			
+			gp.npc[gp.currentMap][i].move(direction);
 		}
-//		gp.keyH.enterPressed = false;
 	}
 	
 	public void contactMonster(int i) {
@@ -497,6 +518,9 @@ public class Player extends Entity {
 //			System.out.println("HIT!");
 			if (gp.monster[gp.currentMap][i].invincible == false) {				
 				gp.playSE(5);
+				
+//				Decrease durability of the weapon
+				currentWeapon.durability--;
 				
 				if (knockBackPower > 0) {
 					setKnockBack(gp.monster[gp.currentMap][i], attacker, knockBackPower);
@@ -544,8 +568,8 @@ public class Player extends Entity {
 			defense = getDefense();
 			
 			gp.playSE(8);
-			gp.gameState = gp.dialogueState;
-			gp.ui.currentDialogue = "You are level " + level + " now!\n" + "You feel stronger :))";
+			setDialogue();
+			startDialogue(this, 0);
 		}
 	}
 	
@@ -555,7 +579,7 @@ public class Player extends Entity {
 		if (itemIndex < inventory.size()) {
 			Entity selectedItem = inventory.get(itemIndex);
 			
-			if (selectedItem.type == type_sword || selectedItem.type == type_axe) {
+			if (selectedItem.type == type_sword || selectedItem.type == type_axe || selectedItem.type == type_pickaxe) {
 				currentWeapon = selectedItem;
 				attack = getAttack();
 				getAttackImage();
@@ -601,9 +625,11 @@ public class Player extends Entity {
 	public boolean canObtainItem(Entity item) {
 		boolean canObtain = false;
 		
+		Entity newItem = gp.eGenerator.getObject(item.name);
+		
 //		Check if stackable
-		if (item.stackable == true) {
-			int index = searchItemInInventory(item.name);
+		if (newItem.stackable == true) {
+			int index = searchItemInInventory(newItem.name);
 			if (index != 999) {
 				inventory.get(index).amount++;
 				canObtain = true;
@@ -611,7 +637,7 @@ public class Player extends Entity {
 			else {
 //				New item - check vacancy
 				if (inventory.size() != maxInventorySize) {
-					inventory.add(item);
+					inventory.add(newItem);
 					canObtain = true;
 				}
 			}
@@ -619,7 +645,7 @@ public class Player extends Entity {
 		else {
 //			Not stackable
 			if (inventory.size() != maxInventorySize) {
-				inventory.add(item);
+				inventory.add(newItem);
 				canObtain = true;
 			}
 		}
