@@ -19,7 +19,12 @@ public class Entity {
 //	1 and 2 are front and back
 //	0 is idle
 	public BufferedImage up0, up1, up2, down0, down1, down2, left0, left1, left2, right0, right1, right2;
-	public BufferedImage attackUp1, attackUp2, attackDown1, attackDown2, attackRight1, attackRight2, attackLeft1, attackLeft2;
+	public BufferedImage 
+		attackUp1, attackUp2, 
+		attackDown1, attackDown2, 
+		attackRight1, attackRight2, 
+		attackLeft1, attackLeft2,
+		guardUp, guardDown, guardLeft, guardRight;
 	public BufferedImage image, image2, image3;
 	public boolean collision = false;
 	public Rectangle solidArea = new Rectangle(0, 0, 48, 48);
@@ -42,6 +47,11 @@ public class Entity {
 	public boolean onPath = false;
 	public boolean knockBack = false;
 	public String knockBackDirection;
+	public boolean guarding = false;
+	public boolean transparent = false;
+	public boolean offBalance = false;
+	public Entity loot;
+	public boolean opened = false;
 	
 //	Counter
 	public int spriteCounter = 0;
@@ -51,6 +61,8 @@ public class Entity {
 	int dyingCounter = 0;
 	int hpBarCounter = 0;
 	int knockBackCounter = 0;
+	public int guardCounter = 0;
+	int offBalanceCounter = 0;
 
 //	Character status
 	public int maxLife;
@@ -155,6 +167,10 @@ public class Entity {
 	public int getGoalRow(Entity target) {
 		int goalRow = (target.worldY + target.solidArea.y)/gp.tileSize;
 		return goalRow;
+	}
+	
+	public void setLoot(Entity loot) {
+		
 	}
 	
 	public void setAction() {
@@ -350,6 +366,14 @@ public class Entity {
 		if (shotAvailableCounter < 72) {
 			shotAvailableCounter++;
 		}
+		
+		if (offBalance == true) {
+			offBalanceCounter++;
+			if (offBalanceCounter > 144) {
+				offBalance = false;
+				offBalanceCounter = 0;
+			}
+		}
 	}
 	
 	public void checkAttackOrNot(int rate, int straight, int horizontal) {
@@ -395,8 +419,9 @@ public class Entity {
 	}
 	
 	public void checkShootOrNot(int rate, int shotInterval) {
-		int i = new Random().nextInt(rate) + 1;
+		int i = new Random().nextInt(rate);
 		
+//		0 or rate - 2?
 		if (i == 0 && projectile.alive == false && shotAvailableCounter == shotInterval) {
 			projectile.set(worldX, worldY, direction, true, this);
 			
@@ -455,6 +480,27 @@ public class Entity {
 			
 			actionLockCounter = 0;
 		}
+	}
+	
+	public String getOppositeDirection(String direction) {
+		String oppositeDirection = "";
+		
+		switch(direction) {
+		case "up":
+			oppositeDirection = "down";
+			break;
+		case "down":
+			oppositeDirection = "up";
+			break;
+		case "left":
+			oppositeDirection = "right";
+			break;
+		case "right":
+			oppositeDirection = "left";
+			break;
+		}
+		
+		return oppositeDirection;
 	}
 	
 	public void attacking() {
@@ -524,12 +570,38 @@ public class Entity {
 	
 	public void damagePlayer(int attack) {
 		if (gp.player.invincible == false) {
-			gp.playSE(6);
-			
 			int damage = attack - gp.player.defense;
 			
-			if (damage < 0) {
-				damage = 0;
+//			Get opposite direction of the attacker
+			String canGuardDirection = getOppositeDirection(direction);
+			
+			if (gp.player.guarding && gp.player.direction.equals(canGuardDirection)) {
+//				Parry
+				if (gp.player.guardCounter < 48) {
+					damage = 0;
+					gp.playSE(16);
+					setKnockBack(this, gp.player, knockBackPower);
+					offBalance = true;
+					spriteCounter = -60;
+				}
+				else {
+//					Normal block
+					damage /= 3;
+					gp.playSE(15);
+				}
+			}
+			else {
+//				Not guarding
+				gp.playSE(6);
+				
+				if (damage < 1) {
+					damage = 1;
+				}
+			}
+			
+			if (damage != 0) {
+				gp.player.transparent = true;
+				setKnockBack(gp.player, this, knockBackPower);
 			}
 			
 			gp.player.life -= damage;
@@ -840,10 +912,10 @@ public class Entity {
 		int nextWorldY = user.getTopY();
 		
 		switch (user.direction) {
-		case "up": nextWorldY = user.getTopY() - 1; break;
-		case "down": nextWorldY = user.getBottomY() + 1; break;
-		case "left": nextWorldX = user.getLeftX() - 1; break;
-		case "right": nextWorldX = user.getRightX() + 1; break;
+		case "up": nextWorldY = user.getTopY() - gp.player.speed; break;
+		case "down": nextWorldY = user.getBottomY() + gp.player.speed; break;
+		case "left": nextWorldX = user.getLeftX() - gp.player.speed; break;
+		case "right": nextWorldX = user.getRightX() + gp.player.speed; break;
 		}
 		
 		int col = nextWorldX / gp.tileSize;
