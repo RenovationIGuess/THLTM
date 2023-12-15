@@ -23,7 +23,7 @@ public class OBJ_Tent extends Entity {
 		gp.playSE(14);
 //		gp.player.life = gp.player.maxLife;
 //		gp.player.mana = gp.player.maxMana;
-		gp.player.restoreLifeAndMana();
+		gp.player.restoreStatus();
 		gp.player.getSleepingImage(down1);
 		return true;
 	}

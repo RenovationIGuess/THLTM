@@ -4,7 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
-	public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, shotKeyPressed;
+	public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, shotKeyPressed, spacePressed;
 	GamePanel gp;
 	
 //	DEBUG
@@ -88,7 +88,9 @@ public class KeyHandler implements KeyListener {
 				}
 				
 				if (gp.ui.commandNum == 1) {
-//					
+					gp.saveLoad.load();
+					gp.gameState = gp.playState;
+					gp.playMusic(22);
 				}
 				
 				if (gp.ui.commandNum == 2) {
@@ -205,6 +207,10 @@ public class KeyHandler implements KeyListener {
 				break;
 			}
 		}
+		
+		if (code == KeyEvent.VK_SPACE) {
+			spacePressed = true;
+		}
 	}
 	
 	public void pauseState(int code) {
@@ -314,13 +320,13 @@ public class KeyHandler implements KeyListener {
 		
 		if (code == KeyEvent.VK_ENTER) {
 			if (gp.ui.commandNum == 0) {
-				gp.retry();
+				gp.resetGame(false);
 				gp.gameState = gp.playState;
 				gp.playMusic(22);
 			} 
 			else if (gp.ui.commandNum == 1) {
 				gp.gameState = gp.titleState;
-				gp.restart();
+				gp.resetGame(true);
 			}
 		}
 	}
@@ -450,6 +456,14 @@ public class KeyHandler implements KeyListener {
 		
 		if (code == KeyEvent.VK_F) {
 			shotKeyPressed = false;
+		}
+		
+		if (code == KeyEvent.VK_ENTER) {
+			enterPressed = false;
+		}
+		
+		if (code == KeyEvent.VK_SPACE) {
+			spacePressed = false;
 		}
 	}
 }
