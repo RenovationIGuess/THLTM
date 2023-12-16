@@ -9,6 +9,7 @@ public class KeyHandler implements KeyListener {
 	
 //	DEBUG
 	boolean showDebugText = false;
+	public boolean godModeOn = false;
 	
 	public KeyHandler(GamePanel gp) {
 		this.gp = gp;
@@ -40,7 +41,7 @@ public class KeyHandler implements KeyListener {
 			pauseState(code);
 		}
 		
-		else if (gp.gameState == gp.dialogueState) {
+		else if (gp.gameState == gp.dialogueState || gp.gameState == gp.cutsceneState) {
 			dialogueState(code);
 		}
 		
@@ -205,6 +206,28 @@ public class KeyHandler implements KeyListener {
 			case 1:
 				gp.tileM.loadMap("/map/interior01.txt", 1);
 				break;
+			}
+		}
+
+		if (code == KeyEvent.VK_G) {
+			if (!godModeOn) {
+				gp.stopMusic();
+				gp.playMusic(21);
+				godModeOn = true;
+			} else {
+				gp.stopMusic();
+				if (gp.currentArea == gp.outside) {
+					gp.playMusic(20);
+				}
+				
+				if (gp.currentArea == gp.indoor) {
+					gp.playMusic(21);
+				}
+				
+				if (gp.currentArea == gp.dungeon) {
+					gp.playMusic(22);
+				}
+				godModeOn = false;
 			}
 		}
 		

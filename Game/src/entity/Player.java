@@ -47,13 +47,15 @@ public class Player extends Entity {
 	}
 	
 	public void setDefaultValues() {
-//		worldX = gp.tileSize * 23;
-//		worldY = gp.tileSize * 21;
+		worldX = gp.tileSize * 23;
+		worldY = gp.tileSize * 21;
 //		worldX = gp.tileSize * 12;
 //		worldY = gp.tileSize * 13;
-		worldX = gp.tileSize * 40;
-		worldY = gp.tileSize * 40;
-		gp.currentMap = 2;
+//		worldX = gp.tileSize * 40;
+//		worldY = gp.tileSize * 40;
+//		worldX = gp.tileSize * 26;
+//		worldY = gp.tileSize * 40;
+//		gp.currentMap = 3;
 		defaultSpeed = 2;
 		speed = defaultSpeed;
 		direction = "down";
@@ -86,6 +88,7 @@ public class Player extends Entity {
 	}
 	
 	public void setDefaultPositions() {
+		gp.currentMap = 0;
 		worldX = gp.tileSize * 23;
 		worldY = gp.tileSize * 21;
 		direction = "down";
@@ -417,11 +420,24 @@ public class Player extends Entity {
 			mana = maxMana;
 		}
 		
-		if (life <= 0) {
-			gp.gameState = gp.gameOverState;
-			gp.ui.commandNum = -1;
-			gp.stopMusic();
-			gp.playSE(12);
+		if (keyH.godModeOn == false) {
+			if (life <= 0) {
+				gp.gameState = gp.gameOverState;
+				gp.ui.commandNum = -1;
+				gp.stopMusic();
+				gp.playSE(12);
+			}
+		}
+		else {
+			strength = 50;
+			getAttack();
+			dexterity = 50;
+			getDefense();
+			maxLife = 20;
+			life = maxLife;
+			maxMana = 12;
+			mana = maxMana;
+			speed = 4;
 		}
 	}
 	
@@ -762,7 +778,9 @@ public class Player extends Entity {
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
 		}
 		
-		g2.drawImage(image, tempScreenX, tempScreenY, null);
+		if (drawing == true) {
+			g2.drawImage(image, tempScreenX, tempScreenY, null);
+		}
 		
 //		Reset alpha
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));

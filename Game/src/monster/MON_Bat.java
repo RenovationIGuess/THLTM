@@ -9,29 +9,28 @@ import object.OBJ_Heart;
 import object.OBJ_ManaCrystal;
 import object.OBJ_Rock;
 
-public class MON_GreenSlime extends Entity {
+public class MON_Bat extends Entity {
 	GamePanel gp;
 	
-	public MON_GreenSlime(GamePanel gp) {
+	public MON_Bat(GamePanel gp) {
 		super(gp);
 		
 		this.gp = gp;
 		
 		type = type_monster;
-		name = "Green Slime";
-		defaultSpeed = 1;
+		name = "Bat";
+		defaultSpeed = 3;
 		speed = defaultSpeed;
-		maxLife = 4;
+		maxLife = 6;
 		life = maxLife;
-		attack = 2;
+		attack = 3;
 		defense = 0;
-		exp = 2;
-		projectile = new OBJ_Rock(gp);
+		exp = 6;
 		
 		solidArea.x = 3;
-		solidArea.y = 18;
+		solidArea.y = 15;
 		solidArea.width = 42;
-		solidArea.height = 30;
+		solidArea.height = 21;
 		solidAreaDefaultX = solidArea.x;
 		solidAreaDefaultY = solidArea.y;
 		
@@ -39,43 +38,43 @@ public class MON_GreenSlime extends Entity {
 	}
 	
 	public void getImage() {
-		up1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-		up2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
+		up1 = setup("/monster/bat_down_1", gp.tileSize, gp.tileSize);
+		up2 = setup("/monster/bat_down_2", gp.tileSize, gp.tileSize);
 		
-		down1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-		down2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
+		down1 = setup("/monster/bat_down_1", gp.tileSize, gp.tileSize);
+		down2 = setup("/monster/bat_down_2", gp.tileSize, gp.tileSize);
 		
-		right1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-		right2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
+		right1 = setup("/monster/bat_down_1", gp.tileSize, gp.tileSize);
+		right2 = setup("/monster/bat_down_2", gp.tileSize, gp.tileSize);
 		
-		left1 = setup("/monster/greenslime_down_1", gp.tileSize, gp.tileSize);
-		left2 = setup("/monster/greenslime_down_2", gp.tileSize, gp.tileSize);
+		left1 = setup("/monster/bat_down_1", gp.tileSize, gp.tileSize);
+		left2 = setup("/monster/bat_down_2", gp.tileSize, gp.tileSize);
 	}
 	
 	public void setAction() {
 		if (onPath == true) {
 //			Check if it stops chasing
-			checkStopChasingOrNot(gp.player, 15, 100);
+//			checkStopChasingOrNot(gp.player, 15, 100);
 			
 //			Search the direction to go
-			searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
+//			searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
 			
 //			Check if it shoots a projectile
-			checkShootOrNot(200, 72);
+//			checkShootOrNot(200, 72);
 		}
 		else {
 //			Check if it starts chasing
-			checkStartChasingOrNot(gp.player, 5, 100);
+//			checkStartChasingOrNot(gp.player, 5, 100);
 			
 //			Get a random direction
-			getRandomDirection(144 * 2);
+			getRandomDirection(48);
 		}
 	}
 	
 	public void damageReaction() {
 		actionLockCounter = 0;
 //		direction = gp.player.direction;
-		onPath = true;
+//		onPath = true;
 	}
 	
 	public void checkDrop() {

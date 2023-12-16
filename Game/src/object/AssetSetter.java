@@ -1,12 +1,15 @@
 package object;
 
+import data.Progress;
 import entity.NPC_BigRock;
 import entity.NPC_Merchant;
 import entity.NPC_OldMan;
 import main.GamePanel;
+import monster.MON_Bat;
 import monster.MON_GreenSlime;
 import monster.MON_Orc;
 import monster.MON_RedSlime;
+import monster.MON_SkeletonLord;
 import object.OBJ_Key;
 import tile_interactive.IT_DestructibleWall;
 import tile_interactive.IT_DryTree;
@@ -137,6 +140,33 @@ public class AssetSetter {
 		gp.obj[mapNum][i] = new OBJ_Door_Iron(gp);
 		gp.obj[mapNum][i].worldX = gp.tileSize * 18;
 		gp.obj[mapNum][i].worldY = gp.tileSize * 23;
+		
+		mapNum = 3;
+		i = 0;
+		gp.obj[mapNum][i] = new OBJ_Door_Iron(gp);
+		gp.obj[mapNum][i].worldX = gp.tileSize * 25;
+		gp.obj[mapNum][i].worldY = gp.tileSize * 15;
+		
+		i++;
+		gp.obj[mapNum][i] = new OBJ_Chest(gp);
+		gp.obj[mapNum][i].setLoot(new OBJ_Coin_Bronze(gp));
+		gp.obj[mapNum][i].worldX = gp.tileSize * 24;
+		gp.obj[mapNum][i].worldY = gp.tileSize * 8;
+		
+		i++;
+//		gp.obj[mapNum][i] = new OBJ_Chest(gp);
+//		gp.obj[mapNum][i].setLoot(new OBJ_BlueHeart(gp));
+//		gp.obj[mapNum][i].worldX = gp.tileSize * 25;
+//		gp.obj[mapNum][i].worldY = gp.tileSize * 8;
+		gp.obj[mapNum][i] = new OBJ_BlueHeart(gp);
+		gp.obj[mapNum][i].worldX = gp.tileSize * 25;
+		gp.obj[mapNum][i].worldY = gp.tileSize * 8;
+		
+		i++;
+		gp.obj[mapNum][i] = new OBJ_Chest(gp);
+		gp.obj[mapNum][i].setLoot(new OBJ_Coin_Bronze(gp));
+		gp.obj[mapNum][i].worldX = gp.tileSize * 26;
+		gp.obj[mapNum][i].worldY = gp.tileSize * 8;
 	}
 	
 	public void setNPC() {
@@ -248,6 +278,41 @@ public class AssetSetter {
 		gp.monster[mapNum][i] = new MON_Orc(gp);
 		gp.monster[mapNum][i].worldX = gp.tileSize * 12;
 		gp.monster[mapNum][i].worldY = gp.tileSize * 33;
+		
+		mapNum = 2;
+		i = 0;
+		gp.monster[mapNum][i] = new MON_Bat(gp);
+		gp.monster[mapNum][i].worldX = gp.tileSize * 34;
+		gp.monster[mapNum][i].worldY = gp.tileSize * 39;
+		
+		i++;
+		gp.monster[mapNum][i] = new MON_Bat(gp);
+		gp.monster[mapNum][i].worldX = gp.tileSize * 36;
+		gp.monster[mapNum][i].worldY = gp.tileSize * 25;
+		
+		i++;
+		gp.monster[mapNum][i] = new MON_Bat(gp);
+		gp.monster[mapNum][i].worldX = gp.tileSize * 39;
+		gp.monster[mapNum][i].worldY = gp.tileSize * 26;
+		
+		i++;
+		gp.monster[mapNum][i] = new MON_Bat(gp);
+		gp.monster[mapNum][i].worldX = gp.tileSize * 28;
+		gp.monster[mapNum][i].worldY = gp.tileSize * 11;
+		
+		i++;
+		gp.monster[mapNum][i] = new MON_Bat(gp);
+		gp.monster[mapNum][i].worldX = gp.tileSize * 10;
+		gp.monster[mapNum][i].worldY = gp.tileSize * 19;
+		
+		mapNum = 3;
+		i = 0;
+	
+		if (Progress.skeletonLordDefeated == false) {
+			gp.monster[mapNum][i] = new MON_SkeletonLord(gp);
+			gp.monster[mapNum][i].worldX = gp.tileSize * 23;
+			gp.monster[mapNum][i].worldY = gp.tileSize * 16;
+		}
 	}
 	
 	public void setInteractiveTile() {
